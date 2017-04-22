@@ -13,28 +13,15 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell;
-
-import java.io.IOException;
-
-import org.springframework.shell.Bootstrap;
+package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
 /**
- * Contains the application main entry-point.
+ * Defines exceptions that are thrown in commands.
  */
-public class EntryPoint
+public class CommandException extends Exception
 {
-    static
+    CommandException(String message)
     {
-        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
-    }
-
-    /**
-     * The application main entry-point.
-     */
-    public static void main(String[] args) throws IOException
-    {
-        String[] internalArguments = {"--disableInternalCommands"};
-        Bootstrap.main(internalArguments);
+        super(message);
     }
 }

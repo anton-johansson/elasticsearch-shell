@@ -21,6 +21,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.shell.plugin.PromptProvider;
 import org.springframework.stereotype.Component;
 
+import com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor;
+
 /**
  * Provides the prompt itself.
  */

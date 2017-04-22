@@ -13,28 +13,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell;
+package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
-import java.io.IOException;
-
-import org.springframework.shell.Bootstrap;
+import org.springframework.shell.core.ExitShellRequest;
+import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.stereotype.Component;
 
 /**
- * Contains the application main entry-point.
+ * Provides a command for exiting the shell.
  */
-public class EntryPoint
+@Component
+class ExitCommand extends AbstractCommand
 {
-    static
+    @CliCommand(value = {"exit"}, help = "Exits the shell")
+    public ExitShellRequest quit()
     {
-        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
-    }
-
-    /**
-     * The application main entry-point.
-     */
-    public static void main(String[] args) throws IOException
-    {
-        String[] internalArguments = {"--disableInternalCommands"};
-        Bootstrap.main(internalArguments);
+        return ExitShellRequest.NORMAL_EXIT;
     }
 }
