@@ -28,8 +28,8 @@ import org.springframework.stereotype.Component;
 @Order(HIGHEST_PRECEDENCE)
 public class ElasticsearchPromtProvider implements PromptProvider
 {
-    private static char PROMPT_CHARACTER = 0x276F;
-    private static String PROMPT = String.valueOf(PROMPT_CHARACTER) + " ";
+    private static final char PROMPT_CHARACTER = 0x276F;
+    private static final String PROMPT = String.valueOf(PROMPT_CHARACTER) + " ";
 
     @Override
     public String getPrompt()

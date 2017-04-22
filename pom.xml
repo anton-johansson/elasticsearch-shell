@@ -19,21 +19,65 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.viskan</groupId>
+        <artifactId>parent</artifactId>
+        <version>5</version>
+    </parent>
     <groupId>com.anton-johansson</groupId>
     <artifactId>elasticsearch-shell</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <name>Anton Johansson :: Elasticsearch Shell</name>
+    <description>Provides a shell for managing Elasticsearch instances.</description>
+    <url>https://github.com/anton-johansson/elasticsearch-shell</url>
+
+    <organization />
+
+    <developers>
+        <developer>
+            <id>anton-johansson</id>
+            <name>Anton Johansson</name>
+            <email>antoon.johansson@gmail.com</email>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <url>https://github.com/anton-johansson/elasticsearch-shell/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <scm>
+        <url>https://github.com/anton-johansson/elasticsearch-shell</url>
+        <connection>scm:git:git://github.com/anton-johansson/elasticsearch-shell.git</connection>
+        <developerConnection>scm:git:git@github.com:anton-johansson/elasticsearch-shell.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <!-- Build -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!-- Dependencies -->
+        <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
+
+        <!-- Plug-in dependencies -->
+        <license-maven-plugin.version>3.0</license-maven-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
-            <version>1.2.0.RELEASE</version>
+            <version>${spring-shell.version}</version>
         </dependency>
     </dependencies>
 
@@ -43,7 +87,7 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>3.0</version>
+                <version>${license-maven-plugin.version}</version>
                 <configuration>
                     <header>license-header.txt</header>
                     <excludes>

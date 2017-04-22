@@ -28,7 +28,7 @@ public enum ConsoleColor
     private final String code;
 
     // Prevent instantiation
-    private ConsoleColor(String code)
+    ConsoleColor(String code)
     {
         this.code = code;
     }
