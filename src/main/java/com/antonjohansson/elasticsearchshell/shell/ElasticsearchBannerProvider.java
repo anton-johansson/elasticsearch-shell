@@ -15,6 +15,7 @@
  */
 package com.antonjohansson.elasticsearchshell.shell;
 
+import static com.antonjohansson.elasticsearchshell.utils.Version.version;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 import org.springframework.core.annotation.Order;
@@ -43,7 +44,7 @@ public class ElasticsearchBannerProvider implements BannerProvider
     @Override
     public String getVersion()
     {
-        return "1.2.3";
+        return version();
     }
 
     @Override
