@@ -24,6 +24,11 @@ import org.springframework.shell.Bootstrap;
  */
 public class EntryPoint
 {
+    static
+    {
+        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+    }
+
     /**
      * The application main entry-point.
      */
