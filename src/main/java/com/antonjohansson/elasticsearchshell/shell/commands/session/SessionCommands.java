@@ -24,6 +24,7 @@ import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import com.antonjohansson.elasticsearchshell.session.SessionKey;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
 import com.antonjohansson.elasticsearchshell.shell.commands.core.AbstractCommand;
 import com.antonjohansson.elasticsearchshell.shell.commands.core.CommandException;
@@ -65,40 +66,40 @@ class SessionCommands extends AbstractCommand
     }
 
     @CliCommand(value = "session-remove", help = "Removes a session")
-    public void remove(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the session to remove") String name)
+    public void remove(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the session to remove") SessionKey key)
     {
         command(() ->
         {
-            if (name.equals(manager.getCurrentSession().getName()))
+            if (key.getName().equals(manager.getCurrentSession().getName()))
             {
                 throw new CommandException("You can't remove the session you are currently working with");
             }
 
-            if (!manager.remove(name))
+            if (!manager.remove(key))
             {
-                throw new CommandException("Session '%s' does not exist", name);
+                throw new CommandException("Session '%s' does not exist", key);
             }
 
-            console().writeLine("Removed session '%s'", WHITE, name);
+            console().writeLine("Removed session '%s'", WHITE, key);
         });
     }
 
     @CliCommand(value = "session", help = "Switches to another session")
-    public void change(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the session to switch to") String name)
+    public void change(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the session to switch to") SessionKey key)
     {
         command(() ->
         {
-            if (name.equals(manager.getCurrentSession().getName()))
+            if (key.getName().equals(manager.getCurrentSession().getName()))
             {
-                throw new CommandException("You are already on session '%s'", name);
+                throw new CommandException("You are already on session '%s'", key);
             }
 
-            if (!manager.setCurrentSession(name))
+            if (!manager.setCurrentSession(key))
             {
-                throw new CommandException("Session '%s' does not exist", name);
+                throw new CommandException("Session '%s' does not exist", key);
             }
 
-            console().writeLine("Switched to '%s'", WHITE, name);
+            console().writeLine("Switched to '%s'", WHITE, key);
         });
     }
 

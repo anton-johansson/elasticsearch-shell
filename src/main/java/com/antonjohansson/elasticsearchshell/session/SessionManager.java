@@ -98,22 +98,23 @@ public class SessionManager
     /**
      * Removes the session with the given name, if it exists.
      *
-     * @param name The name of the session to remove.
+     * @param key The key of the session to remove.
      * @return Returns {@code true} if the session existed and is now removed; otherwise, {@code false}.
      */
-    public boolean remove(String name)
+    public boolean remove(SessionKey key)
     {
-        return sessions.remove(name) != null;
+        return sessions.remove(key.getName()) != null;
     }
 
     /**
      * Sets the current session.
      *
-     * @param name The name of the session to change to.
+     * @param key The key of the session to change to.
      * @return Returns {@code true} if the session existed and is now switched to, otherwise; {@code false}.
      */
-    public boolean setCurrentSession(String name)
+    public boolean setCurrentSession(SessionKey key)
     {
+        String name = key.getName();
         if (!sessions.containsKey(name))
         {
             return false;
