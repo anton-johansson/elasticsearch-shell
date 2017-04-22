@@ -36,20 +36,22 @@ public class Console
      * Writes a line of text to the console.
      *
      * @param text The text to write to the console.
+     * @param params The parameters to the text.
      */
-    public void writeLine(String text)
+    public void writeLine(String text, Object... params)
     {
-        LOG.info(text);
+        LOG.info(String.format(text, params));
     }
 
     /**
      * Writes a line of colored text to the console.
      * 
      * @param text The text to write to the console.
+     * @param params The parameters to the text.
      * @param color The color to use.
      */
-    public void writeLine(String text, ConsoleColor color)
+    public void writeLine(String text, ConsoleColor color, Object... params)
     {
-        LOG.info(color.format(text));
+        LOG.info(color.format(String.format(text, params)));
     }
 }

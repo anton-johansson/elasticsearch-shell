@@ -15,13 +15,10 @@
  */
 package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.plugin.BannerProvider;
 import org.springframework.shell.plugin.PluginUtils;
 import org.springframework.stereotype.Component;
-
-import com.antonjohansson.elasticsearchshell.shell.output.Console;
 
 /**
  * Provides a command for getting the shell version.
@@ -29,14 +26,6 @@ import com.antonjohansson.elasticsearchshell.shell.output.Console;
 @Component
 class VersionCommand extends AbstractCommand
 {
-    private final Console console;
-
-    @Autowired
-    VersionCommand(Console console)
-    {
-        this.console = console;
-    }
-
     @CliCommand(value = {"version"}, help = "Displays the version of the shell")
     public void version()
     {
@@ -44,7 +33,7 @@ class VersionCommand extends AbstractCommand
         {
             BannerProvider banner = PluginUtils.getHighestPriorityProvider(context(), BannerProvider.class);
             String version = banner.getVersion();
-            console.writeLine(version);
+            console().writeLine(version);
         });
     }
 }

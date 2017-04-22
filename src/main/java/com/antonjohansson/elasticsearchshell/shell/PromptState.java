@@ -13,15 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.shell.commands.core;
+package com.antonjohansson.elasticsearchshell.shell;
+
+import org.springframework.stereotype.Component;
 
 /**
- * Defines exceptions that are thrown in commands.
+ * Holds state of the prompt.
  */
-public class CommandException extends Exception
+@Component
+public class PromptState
 {
-    public CommandException(String message, Object... params)
+    private boolean lastSuccess = true;
+
+    public boolean isLastSuccess()
     {
-        super(String.format(message, params));
+        return lastSuccess;
+    }
+
+    public void setLastSuccess(boolean lastSuccess)
+    {
+        this.lastSuccess = lastSuccess;
     }
 }

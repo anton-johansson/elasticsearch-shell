@@ -21,7 +21,8 @@ package com.antonjohansson.elasticsearchshell.shell.output;
 public enum ConsoleColor
 {
     GREEN("\u001B[32m"),
-    RED("\u001B[31m");
+    RED("\u001B[31m"),
+    WHITE("\u001B[37m");
 
     private static final String RESET = "\u001B[0m";
 

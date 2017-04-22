@@ -15,10 +15,16 @@
  */
 package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
+
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.shell.core.CommandMarker;
+
+import com.antonjohansson.elasticsearchshell.shell.PromptState;
+import com.antonjohansson.elasticsearchshell.shell.output.Console;
 
 /**
  * Skeleton for commands.
@@ -26,11 +32,25 @@ import org.springframework.shell.core.CommandMarker;
 public abstract class AbstractCommand implements CommandMarker, ApplicationContextAware
 {
     private ApplicationContext context;
+    private Console console;
+    private PromptState promptState;
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException
     {
         this.context = context;
+    }
+
+    @Autowired
+    public void setConsole(Console console)
+    {
+        this.console = console;
+    }
+
+    @Autowired
+    public void setPromptState(PromptState promptState)
+    {
+        this.promptState = promptState;
     }
 
     /**
@@ -44,6 +64,16 @@ public abstract class AbstractCommand implements CommandMarker, ApplicationConte
     }
 
     /**
+     * Gets the console.
+     *
+     * @return Returns the console.
+     */
+    public Console console()
+    {
+        return console;
+    }
+
+    /**
      * Runs a command.
      *
      * @param command The command to run.
@@ -53,10 +83,12 @@ public abstract class AbstractCommand implements CommandMarker, ApplicationConte
         try
         {
             command.command();
+            promptState.setLastSuccess(true);
         }
         catch (CommandException e)
         {
-            System.err.println(e.getMessage());
+            console.writeLine(e.getMessage(), RED);
+            promptState.setLastSuccess(false);
         }
     }
 }

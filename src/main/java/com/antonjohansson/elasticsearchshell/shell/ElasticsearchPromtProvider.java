@@ -15,8 +15,11 @@
  */
 package com.antonjohansson.elasticsearchshell.shell;
 
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.GREEN;
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.shell.plugin.PromptProvider;
 import org.springframework.stereotype.Component;
@@ -33,10 +36,18 @@ public class ElasticsearchPromtProvider implements PromptProvider
     private static final char PROMPT_CHARACTER = 0x276F;
     private static final String PROMPT = String.valueOf(PROMPT_CHARACTER) + " ";
 
+    private final PromptState state;
+
+    @Autowired
+    ElasticsearchPromtProvider(PromptState state)
+    {
+        this.state = state;
+    }
+
     @Override
     public String getPrompt()
     {
-        ConsoleColor color = ConsoleColor.GREEN;
+        ConsoleColor color = state.isLastSuccess() ? GREEN : RED;
         return color.format(PROMPT);
     }
 
