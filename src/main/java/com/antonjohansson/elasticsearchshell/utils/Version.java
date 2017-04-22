@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 public final class Version
 {
     private static final String IMPLEMENTATION_VERSION = Version.class.getPackage().getImplementationVersion();
-    private static final String VERSION = StringUtils.defaultIfBlank(IMPLEMENTATION_VERSION, "master");
+    private static final String VERSION = StringUtils.defaultIfBlank(IMPLEMENTATION_VERSION, "development");
 
     // Prevent instantiation.
     private Version()
