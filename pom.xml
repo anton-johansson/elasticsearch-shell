@@ -65,6 +65,7 @@
         <!-- Build -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <!-- Dependencies -->
         <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
@@ -93,10 +94,12 @@
                     <excludes>
                         <exclude>README.md</exclude>
                         <exclude>LICENSE</exclude>
+                        <exclude>.checkstyle</exclude>
                     </excludes>
                 </configuration>
                 <executions>
                     <execution>
+                        <id>check-licenses</id>
                         <goals>
                             <goal>check</goal>
                         </goals>
