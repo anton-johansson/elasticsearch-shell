@@ -16,12 +16,9 @@
 package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.shell.core.CommandMarker;
-
-import com.antonjohansson.elasticsearchshell.shell.output.Console;
 
 /**
  * Skeleton for commands.
@@ -29,18 +26,11 @@ import com.antonjohansson.elasticsearchshell.shell.output.Console;
 public abstract class AbstractCommand implements CommandMarker, ApplicationContextAware
 {
     private ApplicationContext context;
-    private Console console;
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException
     {
         this.context = context;
-    }
-
-    @Autowired
-    public void setConsole(Console console)
-    {
-        this.console = console;
     }
 
     /**
@@ -51,16 +41,6 @@ public abstract class AbstractCommand implements CommandMarker, ApplicationConte
     protected ApplicationContext context()
     {
         return context;
-    }
-
-    /**
-     * Gets the console.
-     *
-     * @return Returns the console.
-     */
-    protected Console console()
-    {
-        return console;
     }
 
     /**
