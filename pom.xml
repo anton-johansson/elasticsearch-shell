@@ -106,6 +106,7 @@
                 <executions>
                     <execution>
                         <id>check-licenses</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>check</goal>
                         </goals>
