@@ -13,25 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.session;
+package com.antonjohansson.elasticsearchshell.connection;
 
 import static java.util.Objects.hash;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import com.antonjohansson.elasticsearchshell.connection.Connection;
-
 /**
- * Defines a session.
+ * Defines a connection that can be used to manage Elasticsearch nodes.
  */
-public class Session
+public class Connection
 {
     private String name = "";
-    private Connection connection;
+    private String host = "";
+    private int port;
 
     public String getName()
     {
@@ -43,14 +40,39 @@ public class Session
         this.name = name;
     }
 
-    public Optional<Connection> getConnection()
+    public String getHost()
     {
-        return Optional.ofNullable(connection);
+        return host;
     }
 
-    public void setConnection(Connection connection)
+    public void setHost(String host)
     {
-        this.connection = connection;
+        this.host = host;
+    }
+
+    public int getPort()
+    {
+        return port;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
+
+    /**
+     * Gets the URL of this connection.
+     *
+     * @return Returns the connection URL.
+     */
+    public String getURL()
+    {
+        return new StringBuilder()
+                .append("http://")
+                .append(host)
+                .append(":")
+                .append(port)
+                .toString();
     }
 
     @Override
@@ -71,10 +93,11 @@ public class Session
             return true;
         }
 
-        Session that = (Session) obj;
+        Connection that = (Connection) obj;
         return new EqualsBuilder()
                 .append(this.name, that.name)
-                .append(this.connection, that.connection)
+                .append(this.host, that.host)
+                .append(this.port, that.port)
                 .isEquals();
     }
 
