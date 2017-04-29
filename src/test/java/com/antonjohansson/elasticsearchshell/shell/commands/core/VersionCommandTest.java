@@ -16,26 +16,35 @@
 package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import org.springframework.shell.core.annotation.CliCommand;
-import org.springframework.shell.plugin.BannerProvider;
-import org.springframework.shell.plugin.PluginUtils;
-import org.springframework.stereotype.Component;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.springframework.shell.core.CommandResult;
+
+import com.antonjohansson.elasticsearchshell.shell.output.Console;
 
 /**
- * Provides a command for getting the shell version.
+ * Unit tests of {@link VersionCommand}.
  */
-@Component
-class VersionCommand extends AbstractCommand
+public class VersionCommandTest extends AbstractCommandTest<VersionCommand>
 {
-    @CliCommand(value = {"version"}, help = "Displays the version of the shell")
-    public void version()
+    private @Mock Console console;
+
+    @Override
+    protected void initMocks()
     {
-        command(() ->
-        {
-            BannerProvider banner = PluginUtils.getHighestPriorityProvider(context(), BannerProvider.class);
-            String version = banner.getVersion();
-            console().writeLine(version, WHITE);
-        });
+        command().setConsole(console);
+    }
+
+    @Test
+    public void test_version()
+    {
+        CommandResult result = shell().executeCommand("version");
+        assertTrue(result.isSuccess());
+
+        verify(console).writeLine("development", WHITE);
+        verifyNoMoreInteractions(console);
     }
 }
