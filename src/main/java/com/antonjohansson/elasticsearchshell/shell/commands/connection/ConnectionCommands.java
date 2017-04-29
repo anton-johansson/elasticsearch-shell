@@ -20,6 +20,7 @@ import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WH
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,7 @@ import com.antonjohansson.elasticsearchshell.shell.commands.core.CommandExceptio
  * Provides commands for managing connections.
  */
 @Component
-class ConnectionCommands extends AbstractCommand
+public class ConnectionCommands extends AbstractCommand
 {
     private final ConnectionManager connectionManager;
     private final SessionManager sessionManager;
@@ -51,6 +52,7 @@ class ConnectionCommands extends AbstractCommand
         this.clientFactory = clientFactory;
     }
 
+    /** Connects to a specific connection. */
     @CliCommand(value = "connect", help = "Selects a connection for the current session")
     public void connect(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the connection to choose") ConnectionKey key)
     {
@@ -73,6 +75,7 @@ class ConnectionCommands extends AbstractCommand
         });
     }
 
+    /** Prints the current connection. */
     @CliCommand(value = "connection", help = "Displays the current connection")
     public void current()
     {
@@ -88,6 +91,25 @@ class ConnectionCommands extends AbstractCommand
                 ClusterInfo clusterInfo = clientFactory.getClient().getClusterInfo();
                 console().writeLine("Connected to '%s' at '%s' (version %s)", WHITE, clusterInfo.getClusterName(), currentConnection.get().getURL(), clusterInfo.getVersion().getNumber());
             }
+        });
+    }
+
+    /** Indicates whether or not the current session is connected. */
+    @CliAvailabilityIndicator("disconnect")
+    public boolean isConnected()
+    {
+        return sessionManager.getCurrentSession().getConnection().isPresent();
+    }
+
+    /** Disconnects from the current connection. */
+    @CliCommand(value = "disconnect", help = "Disconnects from the current connection")
+    public void disconnect()
+    {
+        command(() ->
+        {
+            Connection connection = sessionManager.getCurrentSession().getConnection().get();
+            sessionManager.getCurrentSession().setConnection(null);
+            console().writeLine("Disconnected from '%s'", WHITE, connection.getURL());
         });
     }
 }
