@@ -17,12 +17,15 @@ package com.antonjohansson.elasticsearchshell.shell.commands.core;
 
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
 
+import java.util.Optional;
+
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.shell.core.CommandMarker;
 
+import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.shell.PromptState;
 import com.antonjohansson.elasticsearchshell.shell.output.Console;
 
@@ -80,15 +83,27 @@ public abstract class AbstractCommand implements CommandMarker, ApplicationConte
      */
     protected void command(Command command)
     {
+        command(command, null);
+    }
+
+    /**
+     * Runs a command.
+     *
+     * @param command The command to run.
+     * @param onError The command to run when errors occur.
+     */
+    protected void command(Command command, Runnable onError)
+    {
         try
         {
             command.command();
             promptState.setLastSuccess(true);
         }
-        catch (CommandException e)
+        catch (CommandException | ElasticsearchException e)
         {
             console.writeLine(e.getMessage(), RED);
             promptState.setLastSuccess(false);
+            Optional.ofNullable(onError).ifPresent(Runnable::run);
         }
     }
 }

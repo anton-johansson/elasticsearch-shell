@@ -15,7 +15,7 @@
  */
 package com.antonjohansson.elasticsearchshell.shell;
 
-import static com.antonjohansson.elasticsearchshell.utils.Version.version;
+import static com.antonjohansson.elasticsearchshell.common.Version.version;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 import org.springframework.core.annotation.Order;

@@ -69,6 +69,8 @@
 
         <!-- Dependencies -->
         <commons-lang3.version>3.5</commons-lang3.version>
+        <cxf.version>3.1.11</cxf.version>
+        <jackson.version>2.8.8</jackson.version>
         <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
 
         <!-- Plug-in dependencies -->
@@ -80,6 +82,21 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-json-provider</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.shell</groupId>

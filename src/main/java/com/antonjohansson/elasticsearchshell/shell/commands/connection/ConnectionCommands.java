@@ -24,9 +24,11 @@ import org.springframework.shell.core.annotation.CliCommand;
 import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
+import com.antonjohansson.elasticsearchshell.client.ClientFactory;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.connection.ConnectionKey;
 import com.antonjohansson.elasticsearchshell.connection.ConnectionManager;
+import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
 import com.antonjohansson.elasticsearchshell.shell.commands.core.AbstractCommand;
 import com.antonjohansson.elasticsearchshell.shell.commands.core.CommandException;
@@ -39,17 +41,21 @@ class ConnectionCommands extends AbstractCommand
 {
     private final ConnectionManager connectionManager;
     private final SessionManager sessionManager;
+    private final ClientFactory clientFactory;
 
     @Autowired
-    ConnectionCommands(ConnectionManager connectionManager, SessionManager sessionManager)
+    ConnectionCommands(ConnectionManager connectionManager, SessionManager sessionManager, ClientFactory clientFactory)
     {
         this.connectionManager = connectionManager;
         this.sessionManager = sessionManager;
+        this.clientFactory = clientFactory;
     }
 
     @CliCommand(value = "connect", help = "Selects a connection for the current session")
     public void connect(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the connection to choose") ConnectionKey key)
     {
+        Connection previousConnection = sessionManager.getCurrentSession().getConnection().orElse(null);
+
         command(() ->
         {
             Connection connection = connectionManager.get(key).orElseThrow(() -> new CommandException("Connection '%s' does not exist", key));
@@ -59,7 +65,11 @@ class ConnectionCommands extends AbstractCommand
                 throw new CommandException("Already on connection '%s'", connection.getName());
             }
             sessionManager.getCurrentSession().setConnection(connection);
-            console().writeLine("Connection set to '%s'", WHITE, connection.getURL());
+            ClusterInfo clusterInfo = clientFactory.getClient().getClusterInfo();
+            console().writeLine("Connected to cluster '%s' (version %s)", WHITE, clusterInfo.getClusterName(), clusterInfo.getVersion().getNumber());
+        }, () ->
+        {
+            sessionManager.getCurrentSession().setConnection(previousConnection);
         });
     }
 
@@ -75,7 +85,8 @@ class ConnectionCommands extends AbstractCommand
             }
             else
             {
-                console().writeLine("Connection is '%s'", WHITE, currentConnection.get().getURL());
+                ClusterInfo clusterInfo = clientFactory.getClient().getClusterInfo();
+                console().writeLine("Connected to '%s' at '%s' (version %s)", WHITE, clusterInfo.getClusterName(), currentConnection.get().getURL(), clusterInfo.getVersion().getNumber());
             }
         });
     }
