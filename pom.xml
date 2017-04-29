@@ -75,6 +75,7 @@
         <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
 
         <!-- Plug-in dependencies -->
+        <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
         <license-maven-plugin.version>3.0</license-maven-plugin.version>
     </properties>
 
@@ -171,6 +172,18 @@
                             <version>${project.version}</version>
                         </manifestEntries>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura-maven-plugin.version}</version>
+                <configuration>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                    </formats>
+                    <check />
                 </configuration>
             </plugin>
         </plugins>
