@@ -16,10 +16,10 @@
 package com.antonjohansson.elasticsearchshell.connection;
 
 import static java.util.Objects.hash;
-import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Defines a connection that can be used to manage Elasticsearch nodes.
@@ -29,6 +29,8 @@ public class Connection
     private String name = "";
     private String host = "";
     private int port;
+    private String username = "";
+    private String password = "";
 
     public String getName()
     {
@@ -58,6 +60,26 @@ public class Connection
     public void setPort(int port)
     {
         this.port = port;
+    }
+
+    public String getUsername()
+    {
+        return username;
+    }
+
+    public void setUsername(String username)
+    {
+        this.username = username;
+    }
+
+    public String getPassword()
+    {
+        return password;
+    }
+
+    public void setPassword(String password)
+    {
+        this.password = password;
     }
 
     /**
@@ -98,12 +120,20 @@ public class Connection
                 .append(this.name, that.name)
                 .append(this.host, that.host)
                 .append(this.port, that.port)
+                .append(this.username, that.username)
+                .append(this.password, that.password)
                 .isEquals();
     }
 
     @Override
     public String toString()
     {
-        return reflectionToString(this, SHORT_PREFIX_STYLE);
+        return new ToStringBuilder(this, SHORT_PREFIX_STYLE)
+                .append("name", name)
+                .append("host", host)
+                .append("port", port)
+                .append("username", username)
+                .append("password", "*****")
+                .toString();
     }
 }

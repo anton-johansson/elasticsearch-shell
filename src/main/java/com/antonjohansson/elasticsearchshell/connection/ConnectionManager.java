@@ -70,6 +70,8 @@ public class ConnectionManager
             connection.setName(file.getName());
             connection.setHost(properties.getProperty("host"));
             connection.setPort(toInt(properties.getProperty("port")));
+            connection.setUsername(properties.getProperty("username", ""));
+            connection.setPassword(properties.getProperty("password", ""));
             return connection;
         }
         catch (IOException e)
@@ -112,6 +114,8 @@ public class ConnectionManager
         Properties properties = new Properties();
         properties.setProperty("host", connection.getHost());
         properties.setProperty("port", String.valueOf(connection.getPort()));
+        properties.setProperty("username", connection.getUsername());
+        properties.setProperty("password", connection.getPassword());
 
         File file = new File(connectionsPath, connection.getName());
         if (file.exists())

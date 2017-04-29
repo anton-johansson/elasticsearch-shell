@@ -71,6 +71,7 @@
         <commons-lang3.version>3.5</commons-lang3.version>
         <cxf.version>3.1.11</cxf.version>
         <jackson.version>2.8.8</jackson.version>
+        <junit.version>4.12</junit.version>
         <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
 
         <!-- Plug-in dependencies -->
@@ -102,6 +103,12 @@
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
             <version>${spring-shell.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

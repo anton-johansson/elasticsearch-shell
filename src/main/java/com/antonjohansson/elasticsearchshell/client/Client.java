@@ -18,6 +18,9 @@ package com.antonjohansson.elasticsearchshell.client;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static java.util.Arrays.asList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
+import java.util.Base64;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -25,6 +28,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
+import com.antonjohansson.elasticsearchshell.connection.PasswordEncrypter;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -56,9 +60,19 @@ public class Client
         String baseURL = connection.getURL();
         JacksonJsonProvider provider = new JacksonJsonProvider(MAPPER);
 
-        return WebClient.create(baseURL, asList(provider))
+        WebClient client = WebClient.create(baseURL, asList(provider))
                 .accept(APPLICATION_JSON_TYPE)
                 .type(APPLICATION_JSON_TYPE);
+
+        if (!isBlank(connection.getUsername()))
+        {
+            String decryptedPassword = PasswordEncrypter.decrypt(connection.getUsername(), connection.getPassword());
+            String authorizationString = connection.getUsername() + ":" + decryptedPassword;
+            String authorization = "Basic " + Base64.getEncoder().encodeToString(authorizationString.getBytes());
+            client.header("Authorization", authorization);
+        }
+
+        return client;
     }
 
     /**
