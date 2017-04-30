@@ -98,7 +98,7 @@ public class Client
             {
                 throw new ElasticsearchException("Bad credentials");
             }
-            throw e;
+            throw new ElasticsearchException("Unknown error received from the server");
         }
     }
 }
