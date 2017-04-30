@@ -55,6 +55,11 @@ public class Client
         return mapper;
     }
 
+    Connection getConnection()
+    {
+        return connection;
+    }
+
     private WebClient client()
     {
         String baseURL = connection.getURL();
