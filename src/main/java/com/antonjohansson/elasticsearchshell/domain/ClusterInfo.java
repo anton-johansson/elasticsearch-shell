@@ -15,6 +15,12 @@
  */
 package com.antonjohansson.elasticsearchshell.domain;
 
+import static java.util.Objects.hash;
+import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -45,6 +51,37 @@ public class ClusterInfo
         this.version = version;
     }
 
+    @Override
+    public int hashCode()
+    {
+        return hash(clusterName);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || obj.getClass() != getClass())
+        {
+            return false;
+        }
+        if (obj == this)
+        {
+            return true;
+        }
+
+        ClusterInfo that = (ClusterInfo) obj;
+        return new EqualsBuilder()
+                .append(this.clusterName, that.clusterName)
+                .append(this.version, that.version)
+                .isEquals();
+    }
+
+    @Override
+    public String toString()
+    {
+        return reflectionToString(this, SHORT_PREFIX_STYLE);
+    }
+
     /**
      * Describes the version of the cluster.
      */
@@ -60,6 +97,36 @@ public class ClusterInfo
         public void setNumber(String number)
         {
             this.number = number;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return hash(number);
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj == null || obj.getClass() != getClass())
+            {
+                return false;
+            }
+            if (obj == this)
+            {
+                return true;
+            }
+
+            Version that = (Version) obj;
+            return new EqualsBuilder()
+                    .append(this.number, that.number)
+                    .isEquals();
+        }
+
+        @Override
+        public String toString()
+        {
+            return reflectionToString(this, SHORT_PREFIX_STYLE);
         }
     }
 }

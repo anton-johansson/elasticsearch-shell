@@ -73,6 +73,7 @@
         <jackson.version>2.8.8</jackson.version>
         <junit.version>4.12</junit.version>
         <mockito.version>2.7.22</mockito.version>
+        <mockserver-netty.version>3.10.5</mockserver-netty.version>
         <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
         <spring-test.version>4.3.8.RELEASE</spring-test.version>
 
@@ -106,6 +107,12 @@
             <groupId>org.springframework.shell</groupId>
             <artifactId>spring-shell</artifactId>
             <version>${spring-shell.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
+            <version>${mockserver-netty.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
