@@ -40,7 +40,7 @@ class SessionKeyConverter implements Converter<SessionKey>
     @Override
     public boolean supports(Class<?> type, String optionContext)
     {
-        return type.isAssignableFrom(SessionKey.class);
+        return SessionKey.class.isAssignableFrom(type);
     }
 
     @Override
