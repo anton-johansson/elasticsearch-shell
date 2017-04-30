@@ -15,7 +15,12 @@
  */
 package com.antonjohansson.elasticsearchshell.client;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.antonjohansson.elasticsearchshell.connection.Connection;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Contains various Elasticsearch JSON bodies, etc, used for {@link ClientTest}.
@@ -23,7 +28,20 @@ import com.antonjohansson.elasticsearchshell.connection.Connection;
 class ClientTestData
 {
     static final int PORT = 1337;
-    static final String CLUSTER_INFO = "{\"cluster_name\":\"my-test-cluster\",\"version\":{\"number\":\"5.3.0\"}}";
+
+    static final String CLUSTER_INFO = json()
+            .put("cluster_name", "my-test-cluster")
+            .child("version")
+            .put("number", "5.3.0")
+            .parent()
+            .build();
+
+    static final String CLUSTER_HEALTH = json()
+            .put("cluster_name", "my-test-cluster")
+            .put("status", "green")
+            .put("number_of_nodes", 1)
+            .put("number_of_data_nodes", 1)
+            .build();
 
     static Connection connection()
     {
@@ -32,5 +50,67 @@ class ClientTestData
         connection.setPort(PORT);
         connection.setName("my-test-connection");
         return connection;
+    }
+
+    private static Builder json()
+    {
+        return new Builder();
+    }
+
+    /**
+     * Used to build JSON data.
+     */
+    private static class Builder
+    {
+        private static final ObjectMapper MAPPER = new ObjectMapper();
+        protected final Map<String, Object> data = new HashMap<>();
+
+        public Builder put(String key, Object value)
+        {
+            data.put(key, value);
+            return this;
+        }
+
+        public ChildBuilder child(String key)
+        {
+            return new ChildBuilder(key, this);
+        }
+
+        public String build()
+        {
+            try
+            {
+                return MAPPER.writeValueAsString(data);
+            }
+            catch (JsonProcessingException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * Used to build JSON data.
+     */
+    private static class ChildBuilder extends Builder
+    {
+        private final Builder parent;
+
+        ChildBuilder(String key, Builder parent)
+        {
+            this.parent = parent;
+            parent.put(key, data);
+        }
+
+        @Override
+        public ChildBuilder put(String key, Object value)
+        {
+            return (ChildBuilder) super.put(key, value);
+        }
+
+        public Builder parent()
+        {
+            return parent;
+        }
     }
 }

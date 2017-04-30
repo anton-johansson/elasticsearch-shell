@@ -29,6 +29,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.connection.PasswordEncrypter;
+import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -88,6 +89,16 @@ public class Client
     public ClusterInfo getClusterInfo()
     {
         return execute(client -> client.get(ClusterInfo.class));
+    }
+
+    /**
+     * Gets the health of the cluster.
+     *
+     * @return Returns the cluster health.
+     */
+    public ClusterHealth getClusterHealth()
+    {
+        return execute(client -> client.path("/_cluster/health").get(ClusterHealth.class));
     }
 
     private <T> T execute(Function<WebClient, T> mapper)

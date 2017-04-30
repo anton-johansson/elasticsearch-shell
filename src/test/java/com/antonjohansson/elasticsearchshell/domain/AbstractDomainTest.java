@@ -148,7 +148,7 @@ public abstract class AbstractDomainTest<T> extends Assert
         {
             return propertyName + id;
         }
-        if (clazz.isAssignableFrom(Integer.class))
+        if (clazz.isAssignableFrom(int.class))
         {
             return id;
         }

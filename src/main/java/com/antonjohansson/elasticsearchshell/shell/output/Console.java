@@ -40,7 +40,7 @@ public class Console
      */
     public void writeLine(String text, Object... params)
     {
-        LOG.info(String.format(text, params));
+        LOG.info(ConsoleColor.RESET + String.format(text, params));
     }
 
     /**
