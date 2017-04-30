@@ -15,6 +15,7 @@
  */
 package com.antonjohansson.elasticsearchshell.domain;
 
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 
 import java.beans.BeanInfo;
@@ -44,6 +45,14 @@ public abstract class AbstractDomainTest<T> extends Assert
         this.domainClass = (Class<T>) type.getActualTypeArguments()[0];
     }
 
+    /**
+     * Gets a list of properties that are excluded from the test that validates {@link #toString()}.
+     */
+    protected Collection<String> getPropertiesThatAreExcludedFromToString()
+    {
+        return emptyList();
+    }
+
     @Test
     public void test_properties() throws Exception
     {
@@ -70,6 +79,11 @@ public abstract class AbstractDomainTest<T> extends Assert
 
         for (PropertyDescriptor descriptor : getProperties(domainClass))
         {
+            if (getPropertiesThatAreExcludedFromToString().contains(descriptor.getName()))
+            {
+                continue;
+            }
+
             Object value1 = generateValue(descriptor.getName(), descriptor.getPropertyType(), 1);
 
             String data = descriptor.getName() + "=" + value1.toString();
@@ -202,6 +216,8 @@ public abstract class AbstractDomainTest<T> extends Assert
         BeanInfo beanInfo = Introspector.getBeanInfo(clazz);
         return Stream.of(beanInfo.getPropertyDescriptors())
                 .filter(descriptor -> !"class".equals(descriptor.getName()))
+                .filter(descriptor -> descriptor.getReadMethod() != null)
+                .filter(descriptor -> descriptor.getWriteMethod() != null)
                 .collect(toList());
     }
 }

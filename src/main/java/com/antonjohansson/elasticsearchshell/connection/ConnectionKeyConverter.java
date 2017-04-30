@@ -40,7 +40,7 @@ class ConnectionKeyConverter implements Converter<ConnectionKey>
     @Override
     public boolean supports(Class<?> type, String optionContext)
     {
-        return type.isAssignableFrom(ConnectionKey.class);
+        return ConnectionKey.class.isAssignableFrom(type);
     }
 
     @Override

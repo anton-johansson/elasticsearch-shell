@@ -15,6 +15,10 @@
  */
 package com.antonjohansson.elasticsearchshell.connection;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * A key of a connection.
  */
@@ -30,6 +34,30 @@ public class ConnectionKey
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(name);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null || obj.getClass() != getClass())
+        {
+            return false;
+        }
+        if (obj == this)
+        {
+            return true;
+        }
+
+        ConnectionKey that = (ConnectionKey) obj;
+        return new EqualsBuilder()
+                .append(this.name, that.name)
+                .isEquals();
     }
 
     @Override
