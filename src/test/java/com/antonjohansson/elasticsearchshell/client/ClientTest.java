@@ -15,12 +15,11 @@
  */
 package com.antonjohansson.elasticsearchshell.client;
 
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_HEALTH;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_INFO;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.PORT;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.connection;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 import java.util.Base64;
 
@@ -29,10 +28,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockserver.integration.ClientAndServer;
+import org.mockserver.model.HttpRequest;
+import org.mockserver.model.HttpResponse;
 
 import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.connection.PasswordEncrypter;
+import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo.Version;
 
@@ -52,10 +54,21 @@ public class ClientTest extends Assert
     public void setUp()
     {
         server = startClientAndServer(PORT);
-        server.when(request().withHeader("Authorization", authorization("server-error"))).respond(response().withStatusCode(SERVER_ERROR));
-        server.when(request().withHeader("Authorization", authorization("bad-password"))).respond(response().withStatusCode(UNAUTHORIZED));
-        server.when(request().withHeader("Authorization", authorization("ok-password"))).respond(response().withStatusCode(OK).withHeader("Content-Type", JSON).withBody("{}"));
-        server.when(request().withHeader("Accept", JSON).withMethod("GET")).respond(response().withStatusCode(OK).withHeader("Content-Type", JSON).withBody(CLUSTER_INFO));
+        server.when(request().withHeader("Authorization", authorization("server-error"))).respond(response(SERVER_ERROR));
+        server.when(request().withHeader("Authorization", authorization("bad-password"))).respond(response(UNAUTHORIZED));
+        server.when(request().withHeader("Authorization", authorization("ok-password"))).respond(response(OK).withBody("{}"));
+        server.when(request().withMethod("GET").withPath("/_cluster/health")).respond(response(OK).withBody(CLUSTER_HEALTH));
+        server.when(request().withMethod("GET")).respond(response(OK).withBody(CLUSTER_INFO));
+    }
+
+    private HttpRequest request()
+    {
+        return HttpRequest.request().withHeader("Accept", JSON).withHeader("Content-Type", JSON);
+    }
+
+    private HttpResponse response(int statusCode)
+    {
+        return HttpResponse.response().withStatusCode(statusCode).withHeader("Content-Type", JSON);
     }
 
     private String authorization(String password)
@@ -67,6 +80,12 @@ public class ClientTest extends Assert
     public void tearDown()
     {
         server.stop();
+    }
+
+    @Test
+    public void test_getConnection()
+    {
+        assertEquals(connection(), client.getConnection());
     }
 
     @Test
@@ -132,6 +151,20 @@ public class ClientTest extends Assert
         expected.setVersion(version);
 
         ClusterInfo actual = client.getClusterInfo();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_getClusterHealth()
+    {
+        ClusterHealth expected = new ClusterHealth();
+        expected.setClusterName("my-test-cluster");
+        expected.setStatus("green");
+        expected.setNumberOfNodes(1);
+        expected.setNumberOfDataNodes(1);
+
+        ClusterHealth actual = client.getClusterHealth();
 
         assertEquals(expected, actual);
     }
