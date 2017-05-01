@@ -31,15 +31,15 @@ import com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor;
  */
 @Component
 @Order(HIGHEST_PRECEDENCE)
-public class ElasticsearchPromtProvider implements PromptProvider
+public class ElasticsearchPromptProvider implements PromptProvider
 {
-    private static final char PROMPT_CHARACTER = 0x276F;
+    static final char PROMPT_CHARACTER = 0x276F;
     private static final String PROMPT = String.valueOf(PROMPT_CHARACTER) + " ";
 
     private final PromptState state;
 
     @Autowired
-    ElasticsearchPromtProvider(PromptState state)
+    ElasticsearchPromptProvider(PromptState state)
     {
         this.state = state;
     }

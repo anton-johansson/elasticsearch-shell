@@ -16,26 +16,23 @@
 package com.antonjohansson.elasticsearchshell.common;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 /**
- * Provides version utilities.
+ * Holds the shell version.
  */
-public final class Version
+@Component
+public class ShellVersion
 {
-    private static final String IMPLEMENTATION_VERSION = Version.class.getPackage().getImplementationVersion();
+    private static final String IMPLEMENTATION_VERSION = ShellVersion.class.getPackage().getImplementationVersion();
     private static final String VERSION = StringUtils.defaultIfBlank(IMPLEMENTATION_VERSION, "development");
-
-    // Prevent instantiation.
-    private Version()
-    {
-    }
 
     /**
      * Gets the version of the shell.
      *
      * @return Returns the version of the shell.
      */
-    public static String version()
+    public String get()
     {
         return VERSION;
     }

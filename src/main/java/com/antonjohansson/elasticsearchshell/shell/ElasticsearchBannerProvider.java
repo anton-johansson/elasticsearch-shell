@@ -15,12 +15,14 @@
  */
 package com.antonjohansson.elasticsearchshell.shell;
 
-import static com.antonjohansson.elasticsearchshell.common.Version.version;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.shell.plugin.BannerProvider;
 import org.springframework.stereotype.Component;
+
+import com.antonjohansson.elasticsearchshell.common.ShellVersion;
 
 /**
  * Provides the welcome banner.
@@ -29,6 +31,14 @@ import org.springframework.stereotype.Component;
 @Order(HIGHEST_PRECEDENCE)
 public class ElasticsearchBannerProvider implements BannerProvider
 {
+    private final ShellVersion version;
+
+    @Autowired
+    ElasticsearchBannerProvider(ShellVersion version)
+    {
+        this.version = version;
+    }
+
     @Override
     public String getBanner()
     {
@@ -44,7 +54,7 @@ public class ElasticsearchBannerProvider implements BannerProvider
     @Override
     public String getVersion()
     {
-        return version();
+        return version.get();
     }
 
     @Override

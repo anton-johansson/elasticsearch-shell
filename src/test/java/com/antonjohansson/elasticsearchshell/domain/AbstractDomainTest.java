@@ -95,6 +95,17 @@ public abstract class AbstractDomainTest<T> extends Assert
     }
 
     @Test
+    public void test_hashCode() throws Exception
+    {
+        T item1 = createItem(1);
+        T item2 = createItem(2);
+        T item3 = createItem(1);
+
+        assertEquals(item1.hashCode(), item3.hashCode());
+        assertNotEquals(item1.hashCode(), item2.hashCode());
+    }
+
+    @Test
     public void test_equals() throws Exception
     {
         T item1 = createItem(1);

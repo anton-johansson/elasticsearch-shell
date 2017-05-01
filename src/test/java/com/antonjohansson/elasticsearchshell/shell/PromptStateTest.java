@@ -13,28 +13,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell;
+package com.antonjohansson.elasticsearchshell.shell;
 
-import java.io.File;
-
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * Configures various things for the application.
+ * Unit tests of {@link PromptState}.
  */
-@Configuration
-class AppConfiguration
+public class PromptStateTest extends Assert
 {
-    @Bean
-    @Qualifier("configurationPath")
-    public File getConfigurationPath()
+    @Test
+    public void test_isLastSuccess()
     {
-        String homePath = System.getProperty("user.home");
-        File home = new File(homePath);
-        File configurationPath = new File(home, ".elasticsearch-shell");
-        configurationPath.mkdirs();
-        return configurationPath;
+        PromptState state = new PromptState();
+        state.setLastSuccess(true);
+        assertTrue(state.isLastSuccess());
+
+        state.setLastSuccess(false);
+        assertFalse(state.isLastSuccess());
     }
 }
