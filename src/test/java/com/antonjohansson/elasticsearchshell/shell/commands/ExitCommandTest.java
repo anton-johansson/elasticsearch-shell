@@ -13,20 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.shell.commands.core;
+package com.antonjohansson.elasticsearchshell.shell.commands;
 
 import org.junit.Test;
 import org.springframework.shell.core.CommandResult;
+import org.springframework.shell.core.ExitShellRequest;
 
 /**
- * Unit tests of {@link HelpCommand}.
+ * Unit tests of {@link ExitCommand}.
  */
-public class HelpCommandTest extends AbstractCommandTest<HelpCommand>
+public class ExitCommandTest extends AbstractCommandTest<ExitCommand>
 {
     @Test
     public void test()
     {
-        CommandResult result = shell().executeCommand("help");
+        CommandResult result = shell().executeCommand("exit");
         assertTrue(result.isSuccess());
+
+        ExitShellRequest expected = ExitShellRequest.NORMAL_EXIT;
+        ExitShellRequest actual = (ExitShellRequest) result.getResult();
+        assertEquals(expected, actual);
     }
 }

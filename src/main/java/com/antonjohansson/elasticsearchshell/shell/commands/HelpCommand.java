@@ -13,29 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.shell.commands.core;
+package com.antonjohansson.elasticsearchshell.shell.commands;
 
-import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
-
+import org.springframework.shell.core.JLineShellComponent;
+import org.springframework.shell.core.SimpleParser;
 import org.springframework.shell.core.annotation.CliCommand;
-import org.springframework.shell.plugin.BannerProvider;
-import org.springframework.shell.plugin.PluginUtils;
+import org.springframework.shell.core.annotation.CliOption;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides a command for getting the shell version.
+ * Provides a help command for showing available commands and extended details about each command.
  */
 @Component
-class VersionCommand extends AbstractCommand
+class HelpCommand extends AbstractCommand
 {
-    @CliCommand(value = {"version"}, help = "Displays the version of the shell")
-    public void version()
+    @CliCommand(value = "help", help = "Lists all commands usage")
+    public void help(@CliOption(key = {"", "command"}, help = "The command name to get help for") String buffer)
     {
         command(() ->
         {
-            BannerProvider banner = PluginUtils.getHighestPriorityProvider(context(), BannerProvider.class);
-            String version = banner.getVersion();
-            console().writeLine(version, WHITE);
+            JLineShellComponent shell = context().getBean("shell", JLineShellComponent.class);
+            SimpleParser parser = shell.getSimpleParser();
+            parser.obtainHelp(buffer);
         });
     }
 }

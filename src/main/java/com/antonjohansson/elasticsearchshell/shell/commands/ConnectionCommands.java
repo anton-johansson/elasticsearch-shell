@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.shell.commands.connection;
+package com.antonjohansson.elasticsearchshell.shell.commands;
 
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
 
@@ -31,8 +31,6 @@ import com.antonjohansson.elasticsearchshell.connection.ConnectionKey;
 import com.antonjohansson.elasticsearchshell.connection.ConnectionManager;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
-import com.antonjohansson.elasticsearchshell.shell.commands.core.AbstractCommand;
-import com.antonjohansson.elasticsearchshell.shell.commands.core.CommandException;
 
 /**
  * Provides commands for managing connections.

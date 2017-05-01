@@ -13,21 +13,29 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.shell.commands.core;
+package com.antonjohansson.elasticsearchshell.shell.commands;
 
-import org.springframework.shell.core.ExitShellRequest;
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
+
 import org.springframework.shell.core.annotation.CliCommand;
+import org.springframework.shell.plugin.BannerProvider;
+import org.springframework.shell.plugin.PluginUtils;
 import org.springframework.stereotype.Component;
 
 /**
- * Provides a command for exiting the shell.
+ * Provides a command for getting the shell version.
  */
 @Component
-class ExitCommand extends AbstractCommand
+class VersionCommand extends AbstractCommand
 {
-    @CliCommand(value = {"exit"}, help = "Exits the shell")
-    public ExitShellRequest quit()
+    @CliCommand(value = {"version"}, help = "Displays the version of the shell")
+    public void version()
     {
-        return ExitShellRequest.NORMAL_EXIT;
+        command(() ->
+        {
+            BannerProvider banner = PluginUtils.getHighestPriorityProvider(context(), BannerProvider.class);
+            String version = banner.getVersion();
+            console().writeLine(version, WHITE);
+        });
     }
 }

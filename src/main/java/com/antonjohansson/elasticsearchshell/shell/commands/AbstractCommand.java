@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.shell.commands.core;
+package com.antonjohansson.elasticsearchshell.shell.commands;
 
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
 
