@@ -26,6 +26,15 @@ public class ConnectionKey
 {
     private String name = "";
 
+    public ConnectionKey()
+    {
+    }
+
+    public ConnectionKey(String name)
+    {
+        this.name = name;
+    }
+
     public String getName()
     {
         return name;

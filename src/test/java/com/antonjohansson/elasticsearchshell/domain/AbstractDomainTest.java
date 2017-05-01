@@ -60,7 +60,7 @@ public abstract class AbstractDomainTest<T> extends Assert
 
         for (PropertyDescriptor descriptor : getProperties(domainClass))
         {
-            Object value1 = generateValue(descriptor.getName(), descriptor.getPropertyType(), 1);
+            Object value1 = TestDataUtils.createItem(descriptor.getName(), descriptor.getPropertyType(), 1);
             setProperty(item, descriptor, value1);
             Object value2 = getProperty(item, descriptor);
 
@@ -84,7 +84,7 @@ public abstract class AbstractDomainTest<T> extends Assert
                 continue;
             }
 
-            Object value1 = generateValue(descriptor.getName(), descriptor.getPropertyType(), 1);
+            Object value1 = TestDataUtils.createItem(descriptor.getName(), descriptor.getPropertyType(), 1);
 
             String data = descriptor.getName() + "=" + value1.toString();
             if (!output.contains(data))
@@ -167,31 +167,6 @@ public abstract class AbstractDomainTest<T> extends Assert
         }
     }
 
-    private Object generateValue(String propertyName, Class<?> clazz, int id) throws Exception
-    {
-        if (clazz.isAssignableFrom(String.class))
-        {
-            return propertyName + id;
-        }
-        if (clazz.isAssignableFrom(int.class))
-        {
-            return id;
-        }
-
-        Object value = newInstance(clazz);
-        populate(value, id);
-        return value;
-    }
-
-    private void populate(Object value, int id) throws Exception
-    {
-        for (PropertyDescriptor descriptor : getProperties(value.getClass()))
-        {
-            Object innerValue = generateValue(descriptor.getName(), descriptor.getPropertyType(), id);
-            descriptor.getWriteMethod().invoke(value, innerValue);
-        }
-    }
-
     /**
      * Creates a new empty instance of the domain object.
      */
@@ -205,9 +180,7 @@ public abstract class AbstractDomainTest<T> extends Assert
      */
     protected T createItem(int id) throws Exception
     {
-        T value = newInstance(domainClass);
-        populate(value, id);
-        return value;
+        return TestDataUtils.createItem(domainClass, id);
     }
 
     private <B> B newInstance(Class<B> clazz)

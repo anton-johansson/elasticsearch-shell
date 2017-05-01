@@ -50,7 +50,7 @@ public class ClusterCommands extends AbstractCommand
     @CliAvailabilityIndicator("health")
     public boolean isConnected()
     {
-        return sessionManager.getCurrentSession().getConnection().isPresent();
+        return sessionManager.getCurrentSession().getOptionalConnection().isPresent();
     }
 
     /** Prints the cluster health. */

@@ -43,14 +43,19 @@ public class Session
         this.name = name;
     }
 
-    public Optional<Connection> getConnection()
+    public Connection getConnection()
     {
-        return Optional.ofNullable(connection);
+        return connection;
     }
 
     public void setConnection(Connection connection)
     {
         this.connection = connection;
+    }
+
+    public Optional<Connection> getOptionalConnection()
+    {
+        return Optional.ofNullable(connection);
     }
 
     @Override
