@@ -15,21 +15,31 @@
  */
 package com.antonjohansson.elasticsearchshell.shell;
 
+import static org.mockito.Mockito.when;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import com.antonjohansson.elasticsearchshell.common.ShellVersion;
 
 /**
  * Unit tests of {@link ElasticsearchBannerProvider}.
  */
 public class ElasticsearchBannerProviderTest extends Assert
 {
+    private @Mock ShellVersion version;
     private ElasticsearchBannerProvider provider;
 
     @Before
     public void setUp()
     {
-        provider = new ElasticsearchBannerProvider();
+        MockitoAnnotations.initMocks(this);
+        provider = new ElasticsearchBannerProvider(version);
+
+        when(version.get()).thenReturn("1.2.3");
     }
 
     @Test
@@ -53,6 +63,6 @@ public class ElasticsearchBannerProviderTest extends Assert
     @Test
     public void test_getVersion()
     {
-        assertEquals("development", provider.getVersion());
+        assertEquals("1.2.3", provider.getVersion());
     }
 }

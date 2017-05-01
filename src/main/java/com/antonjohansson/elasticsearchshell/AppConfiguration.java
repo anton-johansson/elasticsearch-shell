@@ -35,10 +35,6 @@ class AppConfiguration
         File home = new File(homePath);
         File configurationPath = new File(home, ".elasticsearch-shell");
         configurationPath.mkdirs();
-        if (!configurationPath.exists() || !configurationPath.isDirectory())
-        {
-            throw new ExceptionInInitializerError("Could not find or create configuration directory");
-        }
         return configurationPath;
     }
 }
