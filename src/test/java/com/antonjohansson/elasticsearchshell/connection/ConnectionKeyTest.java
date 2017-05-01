@@ -15,6 +15,8 @@
  */
 package com.antonjohansson.elasticsearchshell.connection;
 
+import org.junit.Test;
+
 import com.antonjohansson.elasticsearchshell.domain.AbstractDomainTest;
 
 /**
@@ -22,6 +24,13 @@ import com.antonjohansson.elasticsearchshell.domain.AbstractDomainTest;
  */
 public class ConnectionKeyTest extends AbstractDomainTest<ConnectionKey>
 {
+    @Test
+    public void test_constructor_with_name()
+    {
+        ConnectionKey key = new ConnectionKey("myConnection");
+        assertEquals("myConnection", key.getName());
+    }
+
     @Override
     public void test_toString() throws Exception
     {

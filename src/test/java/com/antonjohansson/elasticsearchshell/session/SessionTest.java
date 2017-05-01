@@ -15,11 +15,29 @@
  */
 package com.antonjohansson.elasticsearchshell.session;
 
+import org.junit.Test;
+
+import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.domain.AbstractDomainTest;
+import com.antonjohansson.elasticsearchshell.domain.TestDataUtils;
 
 /**
  * Unit tests of {@link Session}.
  */
 public class SessionTest extends AbstractDomainTest<Session>
 {
+    @Test
+    public void test_getOptionalConnection()
+    {
+        Connection expected = TestDataUtils.createItem(Connection.class, 1);
+        Connection actual = TestDataUtils.createItem(Session.class, 1).getOptionalConnection().get();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_getOptionalConnection_without_a_connection()
+    {
+        assertFalse(new Session().getOptionalConnection().isPresent());
+    }
 }

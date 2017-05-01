@@ -44,7 +44,7 @@ public class ClientFactory
     public Client getClient()
     {
         return sessionManager.getCurrentSession()
-                .getConnection()
+                .getOptionalConnection()
                 .map(Client::new)
                 .orElseThrow(() -> new ElasticsearchException("No connection"));
     }

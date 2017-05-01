@@ -38,15 +38,25 @@ import com.antonjohansson.elasticsearchshell.session.SessionManager;
 @Component
 public class ConnectionCommands extends AbstractCommand
 {
-    private final ConnectionManager connectionManager;
-    private final SessionManager sessionManager;
-    private final ClientFactory clientFactory;
+    private ConnectionManager connectionManager;
+    private SessionManager sessionManager;
+    private ClientFactory clientFactory;
 
     @Autowired
-    ConnectionCommands(ConnectionManager connectionManager, SessionManager sessionManager, ClientFactory clientFactory)
+    void setConnectionManager(ConnectionManager connectionManager)
     {
         this.connectionManager = connectionManager;
+    }
+
+    @Autowired
+    void setSessionManager(SessionManager sessionManager)
+    {
         this.sessionManager = sessionManager;
+    }
+
+    @Autowired
+    void setClientFactory(ClientFactory clientFactory)
+    {
         this.clientFactory = clientFactory;
     }
 
@@ -54,12 +64,12 @@ public class ConnectionCommands extends AbstractCommand
     @CliCommand(value = "connect", help = "Selects a connection for the current session")
     public void connect(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the connection to choose") ConnectionKey key)
     {
-        Connection previousConnection = sessionManager.getCurrentSession().getConnection().orElse(null);
+        Connection previousConnection = sessionManager.getCurrentSession().getOptionalConnection().orElse(null);
 
         command(() ->
         {
             Connection connection = connectionManager.get(key).orElseThrow(() -> new CommandException("Connection '%s' does not exist", key));
-            String currentConnectionName = sessionManager.getCurrentSession().getConnection().map(Connection::getName).orElse("");
+            String currentConnectionName = sessionManager.getCurrentSession().getOptionalConnection().map(Connection::getName).orElse("");
             if (currentConnectionName.equals(connection.getName()))
             {
                 throw new CommandException("Already on connection '%s'", connection.getName());
@@ -79,7 +89,7 @@ public class ConnectionCommands extends AbstractCommand
     {
         command(() ->
         {
-            Optional<Connection> currentConnection = sessionManager.getCurrentSession().getConnection();
+            Optional<Connection> currentConnection = sessionManager.getCurrentSession().getOptionalConnection();
             if (!currentConnection.isPresent())
             {
                 console().writeLine("No connection is set",  WHITE);
@@ -96,7 +106,7 @@ public class ConnectionCommands extends AbstractCommand
     @CliAvailabilityIndicator("disconnect")
     public boolean isConnected()
     {
-        return sessionManager.getCurrentSession().getConnection().isPresent();
+        return sessionManager.getCurrentSession().getOptionalConnection().isPresent();
     }
 
     /** Disconnects from the current connection. */
@@ -105,7 +115,7 @@ public class ConnectionCommands extends AbstractCommand
     {
         command(() ->
         {
-            Connection connection = sessionManager.getCurrentSession().getConnection().get();
+            Connection connection = sessionManager.getCurrentSession().getOptionalConnection().get();
             sessionManager.getCurrentSession().setConnection(null);
             console().writeLine("Disconnected from '%s'", WHITE, connection.getURL());
         });
