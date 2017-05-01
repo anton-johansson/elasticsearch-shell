@@ -44,9 +44,10 @@ public abstract class AbstractCommandTest<C extends AbstractCommand> extends Ass
     }
 
     @Before
-    public final void setUpCore()
+    public final void setUpCore() throws Exception
     {
-        Bootstrap bootstrap = new Bootstrap();
+        String[] arguments = {"--disableInternalCommands"};
+        Bootstrap bootstrap = new Bootstrap(arguments);
         shell = bootstrap.getJLineShellComponent();
         command = bootstrap.getApplicationContext().getBean(commandClass);
 
