@@ -74,6 +74,7 @@
         <junit.version>4.12</junit.version>
         <mockito.version>2.7.22</mockito.version>
         <mockserver-netty.version>3.10.5</mockserver-netty.version>
+        <powermock.version>1.7.0RC2</powermock.version>
         <spring-shell.version>1.2.0.RELEASE</spring-shell.version>
         <spring-test.version>4.3.8.RELEASE</spring-test.version>
 
@@ -124,6 +125,18 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito2</artifactId>
+            <version>${powermock.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>${powermock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
