@@ -26,6 +26,15 @@ public class SessionKey
 {
     private String name = "";
 
+    public SessionKey()
+    {
+    }
+
+    public SessionKey(String name)
+    {
+        this.name = name;
+    }
+
     public String getName()
     {
         return name;
