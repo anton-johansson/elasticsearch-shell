@@ -15,6 +15,8 @@
  */
 package com.antonjohansson.elasticsearchshell.session;
 
+import org.junit.Test;
+
 import com.antonjohansson.elasticsearchshell.domain.AbstractDomainTest;
 
 /**
@@ -22,6 +24,13 @@ import com.antonjohansson.elasticsearchshell.domain.AbstractDomainTest;
  */
 public class SessionKeyTest extends AbstractDomainTest<SessionKey>
 {
+    @Test
+    public void test_constructor_with_name()
+    {
+        SessionKey key = new SessionKey("some-name");
+        assertEquals("some-name", key.getName());
+    }
+
     @Override
     public void test_toString() throws Exception
     {

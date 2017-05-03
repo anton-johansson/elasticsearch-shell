@@ -33,10 +33,10 @@ import com.antonjohansson.elasticsearchshell.session.SessionManager;
 @Component
 class SessionCommands extends AbstractCommand
 {
-    private final SessionManager manager;
+    private SessionManager manager;
 
     @Autowired
-    SessionCommands(SessionManager manager)
+    void setManager(SessionManager manager)
     {
         this.manager = manager;
     }
