@@ -28,7 +28,6 @@ import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
-import com.antonjohansson.elasticsearchshell.connection.PasswordEncrypter;
 import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,10 +42,12 @@ public class Client
     private static final ObjectMapper MAPPER = getMapper();
     private static final int UNAUTHORIZED = 401;
     private final Connection connection;
+    private final PasswordEncrypter passwordEncrypter;
 
-    Client(Connection connection)
+    Client(Connection connection, PasswordEncrypter passwordEncrypter)
     {
         this.connection = connection;
+        this.passwordEncrypter = passwordEncrypter;
     }
 
     private static ObjectMapper getMapper()
@@ -72,7 +73,7 @@ public class Client
 
         if (!isBlank(connection.getUsername()))
         {
-            String decryptedPassword = PasswordEncrypter.decrypt(connection.getUsername(), connection.getPassword());
+            String decryptedPassword = passwordEncrypter.decrypt(connection.getUsername(), connection.getPassword());
             String authorizationString = connection.getUsername() + ":" + decryptedPassword;
             String authorization = "Basic " + Base64.getEncoder().encodeToString(authorizationString.getBytes());
             client.header("Authorization", authorization);
