@@ -84,10 +84,6 @@ public class ConnectionManager
     {
         File connections = new File(configurationPath, "connections");
         connections.mkdirs();
-        if (!connections.exists() || !connections.isDirectory())
-        {
-            throw new ExceptionInInitializerError("Could not find or create directory of connections");
-        }
         return connections;
     }
 
@@ -118,11 +114,6 @@ public class ConnectionManager
         properties.setProperty("password", connection.getPassword());
 
         File file = new File(connectionsPath, connection.getName());
-        if (file.exists())
-        {
-            throw new RuntimeException("A file already exists at '" + file.getAbsolutePath() + "'");
-        }
-
         try (OutputStream stream = new FileOutputStream(file))
         {
             properties.store(stream, "");
