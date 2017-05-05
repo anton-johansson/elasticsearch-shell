@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.connection;
+package com.antonjohansson.elasticsearchshell.client;
 
 import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Cipher.ENCRYPT_MODE;
@@ -28,13 +28,15 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * Encrypts and decrypts connection passwords.
  */
-public class PasswordEncrypter
+class PasswordEncrypter
 {
     private static final int KEY_SIZE = 16;
 
-    // Prevent instantiation
-    private PasswordEncrypter()
+    private String algorithm = "AES";
+
+    void setAlgorithm(String algorithm)
     {
+        this.algorithm = algorithm;
     }
 
     /**
@@ -44,13 +46,13 @@ public class PasswordEncrypter
      * @param password The password to encrypt.
      * @return Returns the encrypted password.
      */
-    public static String encrypt(String username, String password)
+    String encrypt(String username, String password)
     {
         try
         {
             String key = rightPad(username, KEY_SIZE).substring(0, KEY_SIZE);
-            Key spec = new SecretKeySpec(key.getBytes(), "AES");
-            Cipher cipher = Cipher.getInstance("AES");
+            Key spec = new SecretKeySpec(key.getBytes(), algorithm);
+            Cipher cipher = Cipher.getInstance(algorithm);
             cipher.init(ENCRYPT_MODE, spec);
             byte[] encrypted = cipher.doFinal(password.getBytes());
             return Base64.getEncoder().encodeToString(encrypted);
@@ -68,13 +70,13 @@ public class PasswordEncrypter
      * @param password The password to decrypt.
      * @return The decrypted password.
      */
-    public static String decrypt(String username, String password)
+    String decrypt(String username, String password)
     {
         try
         {
             String key = rightPad(username, KEY_SIZE).substring(0, KEY_SIZE);
-            Key spec = new SecretKeySpec(key.getBytes(), "AES");
-            Cipher cipher = Cipher.getInstance("AES");
+            Key spec = new SecretKeySpec(key.getBytes(), algorithm);
+            Cipher cipher = Cipher.getInstance(algorithm);
             cipher.init(DECRYPT_MODE, spec);
             byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(password));
             return new String(decrypted);

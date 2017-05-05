@@ -28,6 +28,7 @@ import com.antonjohansson.elasticsearchshell.session.SessionManager;
 @Component
 public class ClientFactory
 {
+    private final PasswordEncrypter passwordEncrypter = new PasswordEncrypter();
     private final SessionManager sessionManager;
 
     @Autowired
@@ -45,7 +46,7 @@ public class ClientFactory
     {
         return sessionManager.getCurrentSession()
                 .getOptionalConnection()
-                .map(Client::new)
+                .map(connection -> new Client(connection, passwordEncrypter))
                 .orElseThrow(() -> new ElasticsearchException("No connection"));
     }
 }

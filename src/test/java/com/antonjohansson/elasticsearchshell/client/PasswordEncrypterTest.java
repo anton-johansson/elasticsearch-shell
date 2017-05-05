@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.connection;
+package com.antonjohansson.elasticsearchshell.client;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -23,14 +23,16 @@ import org.junit.Test;
  */
 public class PasswordEncrypterTest extends Assert
 {
+    private final PasswordEncrypter encrypter = new PasswordEncrypter();
+
     @Test
     public void test_encrypt_and_decrypt()
     {
         String password = "some-test-password";
         String username = "anton-johansson-very-long-username";
 
-        String encryptedPassword = PasswordEncrypter.encrypt(username, password);
-        String decryptedPassword = PasswordEncrypter.decrypt(username, encryptedPassword);
+        String encryptedPassword = encrypter.encrypt(username, password);
+        String decryptedPassword = encrypter.decrypt(username, encryptedPassword);
 
         assertEquals(password, decryptedPassword);
     }
@@ -39,7 +41,7 @@ public class PasswordEncrypterTest extends Assert
     public void test_encrypt()
     {
         String expected = "KRHrY0A/X9l9l8yILBMvpdZhHOqhLyLgrfolGyWgGUI=";
-        String actual = PasswordEncrypter.encrypt("anton-johansson", "some-test-password");
+        String actual = encrypter.encrypt("anton-johansson", "some-test-password");
 
         assertEquals(expected, actual);
     }
@@ -48,7 +50,7 @@ public class PasswordEncrypterTest extends Assert
     public void test_decrypt()
     {
         String expected = "some-test-password";
-        String actual = PasswordEncrypter.decrypt("anton-johansson", "KRHrY0A/X9l9l8yILBMvpdZhHOqhLyLgrfolGyWgGUI=");
+        String actual = encrypter.decrypt("anton-johansson", "KRHrY0A/X9l9l8yILBMvpdZhHOqhLyLgrfolGyWgGUI=");
 
         assertEquals(expected, actual);
     }
@@ -56,6 +58,13 @@ public class PasswordEncrypterTest extends Assert
     @Test(expected = RuntimeException.class)
     public void test_decrypt_bad_format()
     {
-        PasswordEncrypter.decrypt("anton-johansson", "KRHrY0A/X9l9l8yILBMvpdZhHOqhLyLgrfolGyWgGUI=X");
+        encrypter.decrypt("anton-johansson", "KRHrY0A/X9l9l8yILBMvpdZhHOqhLyLgrfolGyWgGUI=X");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void test_decrypt_bad_algorithm()
+    {
+        encrypter.setAlgorithm("unknown-algorithm");
+        encrypter.encrypt("anton-johansson", "some-test-password");
     }
 }

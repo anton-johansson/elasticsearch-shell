@@ -19,6 +19,7 @@ import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTE
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_INFO;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.PORT;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.connection;
+import static org.mockito.Mockito.when;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 import java.util.Base64;
@@ -27,13 +28,14 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 
 import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
-import com.antonjohansson.elasticsearchshell.connection.PasswordEncrypter;
 import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo.Version;
@@ -47,12 +49,20 @@ public class ClientTest extends Assert
     private static final int UNAUTHORIZED = 401;
     private static final int SERVER_ERROR = 500;
     private static final String JSON = "application/json";
-    private final Client client = new Client(connection());
+
     private ClientAndServer server;
+    private Client client;
+    private @Mock PasswordEncrypter passwordEncrypter;
 
     @Before
     public void setUp()
     {
+        MockitoAnnotations.initMocks(this);
+        client = new Client(connection(), passwordEncrypter);
+        when(passwordEncrypter.decrypt("elastic", "encrypted-server-error")).thenReturn("server-error");
+        when(passwordEncrypter.decrypt("elastic", "encrypted-bad-password")).thenReturn("bad-password");
+        when(passwordEncrypter.decrypt("elastic", "encrypted-ok-password")).thenReturn("ok-password");
+
         server = startClientAndServer(PORT);
         server.when(request().withHeader("Authorization", authorization("server-error"))).respond(response(SERVER_ERROR));
         server.when(request().withHeader("Authorization", authorization("bad-password"))).respond(response(UNAUTHORIZED));
@@ -93,9 +103,9 @@ public class ClientTest extends Assert
     {
         Connection connection = connection();
         connection.setUsername("elastic");
-        connection.setPassword(PasswordEncrypter.encrypt("elastic", "bad-password"));
+        connection.setPassword("encrypted-bad-password");
 
-        Client client = new Client(connection);
+        Client client = new Client(connection, passwordEncrypter);
 
         try
         {
@@ -113,11 +123,14 @@ public class ClientTest extends Assert
     {
         Connection connection = connection();
         connection.setUsername("elastic");
-        connection.setPassword(PasswordEncrypter.encrypt("elastic", "ok-password"));
+        connection.setPassword("encrypted-ok-password");
 
-        Client client = new Client(connection);
-        ClusterInfo clusterInfo = client.getClusterInfo();
-        assertNotNull(clusterInfo);
+        Client client = new Client(connection, passwordEncrypter);
+
+        ClusterInfo actual = client.getClusterInfo();
+        ClusterInfo expected = new ClusterInfo();
+
+        assertEquals(expected, actual);
     }
 
     @Test
@@ -125,9 +138,9 @@ public class ClientTest extends Assert
     {
         Connection connection = connection();
         connection.setUsername("elastic");
-        connection.setPassword(PasswordEncrypter.encrypt("elastic", "server-error"));
+        connection.setPassword("encrypted-server-error");
 
-        Client client = new Client(connection);
+        Client client = new Client(connection, passwordEncrypter);
 
         try
         {
