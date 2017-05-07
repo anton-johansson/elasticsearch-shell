@@ -30,6 +30,7 @@ import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.connection.ConnectionKey;
 import com.antonjohansson.elasticsearchshell.connection.ConnectionManager;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
+import com.antonjohansson.elasticsearchshell.index.IndexKey;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
 
 /**
@@ -64,7 +65,8 @@ public class ConnectionCommands extends AbstractCommand
     @CliCommand(value = "connect", help = "Selects a connection for the current session")
     public void connect(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the connection to choose") ConnectionKey key)
     {
-        Connection previousConnection = sessionManager.getCurrentSession().getOptionalConnection().orElse(null);
+        Connection previousConnection = sessionManager.getCurrentSession().getConnection();
+        IndexKey previousIndex = sessionManager.getCurrentSession().getCurrentIndex();
 
         command(() ->
         {
@@ -75,11 +77,13 @@ public class ConnectionCommands extends AbstractCommand
                 throw new CommandException("Already on connection '%s'", connection.getName());
             }
             sessionManager.getCurrentSession().setConnection(connection);
+            sessionManager.getCurrentSession().setCurrentIndex(null);
             ClusterInfo clusterInfo = clientFactory.getClient().getClusterInfo();
             console().writeLine("Connected to cluster '%s' (version %s)", WHITE, clusterInfo.getClusterName(), clusterInfo.getVersion().getNumber());
         }, () ->
         {
             sessionManager.getCurrentSession().setConnection(previousConnection);
+            sessionManager.getCurrentSession().setCurrentIndex(previousIndex);
         });
     }
 
@@ -117,6 +121,7 @@ public class ConnectionCommands extends AbstractCommand
         {
             Connection connection = sessionManager.getCurrentSession().getOptionalConnection().get();
             sessionManager.getCurrentSession().setConnection(null);
+            sessionManager.getCurrentSession().setCurrentIndex(null);
             console().writeLine("Disconnected from '%s'", WHITE, connection.getURL());
         });
     }

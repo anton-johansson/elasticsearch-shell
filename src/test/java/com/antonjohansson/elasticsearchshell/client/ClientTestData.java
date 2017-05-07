@@ -15,17 +15,24 @@
  */
 package com.antonjohansson.elasticsearchshell.client;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 import com.antonjohansson.elasticsearchshell.connection.Connection;
+import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Contains various Elasticsearch JSON bodies, etc, used for {@link ClientTest}.
  */
-class ClientTestData
+public class ClientTestData
 {
     static final int PORT = 1337;
 
@@ -43,6 +50,10 @@ class ClientTestData
             .put("number_of_data_nodes", 1)
             .build();
 
+    static final String ALL_INDICES_AND_MAPPINGS = "{\"my-index\":{\"mappings\":{\"User\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"email\":{\"type\":\"keyword\",\"index\":false},\"firstName\":{\"type\":\"keyword\",\"index\":false},\"lastName\":{\"type\":\"keyword\",\"index\":false},\"password\":{\"type\":\"keyword\",\"index\":false},\"userName\":{\"type\":\"keyword\",\"index\":false}}},\"OtherType\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}}},\"my-other-index\":{\"mappings\":{\"OtherType\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}}}}";
+
+    public static final Map<String, IndexMappings> ACTUAL_ALL_MAPPINGS = allMappings();
+
     static Connection connection()
     {
         Connection connection = new Connection();
@@ -52,9 +63,51 @@ class ClientTestData
         return connection;
     }
 
+    private static Map<String, IndexMappings> allMappings()
+    {
+        Map<String, IndexMappings> mappings = new HashMap<>();
+        mappings.put("my-index", mapping(userMapping(), otherTypeMapping()));
+        mappings.put("my-other-index", mapping(otherTypeMapping()));
+        return mappings;
+    }
+
+    @SafeVarargs
+    private static IndexMappings mapping(Entry<String, Map<String, Object>>... mappings)
+    {
+        IndexMappings mapping = new IndexMappings();
+        mapping.setMappings(Stream.of(mappings).collect(toMap(Entry::getKey, Entry::getValue)));
+        return mapping;
+    }
+
+    private static Entry<String, Map<String, Object>> otherTypeMapping()
+    {
+        Map<String, Object> mapping = toMapFromJson("{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}");
+        return new AbstractMap.SimpleEntry<>("OtherType", mapping);
+    }
+
+    private static Entry<String, Map<String, Object>> userMapping()
+    {
+        Map<String, Object> mapping = toMapFromJson("{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"email\":{\"type\":\"keyword\",\"index\":false},\"firstName\":{\"type\":\"keyword\",\"index\":false},\"lastName\":{\"type\":\"keyword\",\"index\":false},\"password\":{\"type\":\"keyword\",\"index\":false},\"userName\":{\"type\":\"keyword\",\"index\":false}}}");
+        return new AbstractMap.SimpleEntry<>("User", mapping);
+    }
+
     private static Builder json()
     {
         return new Builder();
+    }
+
+    private static Map<String, Object> toMapFromJson(String json)
+    {
+        try
+        {
+            return new ObjectMapper().readValue(json, new TypeReference<Map<String, Object>>()
+            {
+            });
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
