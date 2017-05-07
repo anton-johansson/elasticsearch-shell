@@ -21,6 +21,8 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 /**
@@ -39,6 +41,12 @@ public class TestDataUtils
     @SuppressWarnings("unchecked")
     public static <T> T createItem(String propertyName, Class<T> clazz, int id)
     {
+        if (clazz.isAssignableFrom(Map.class))
+        {
+            Map<Object, Object> map = new HashMap<>();
+            map.put("key", id);
+            return (T) map;
+        }
         if (clazz.isAssignableFrom(String.class))
         {
             return (T) (propertyName + id);

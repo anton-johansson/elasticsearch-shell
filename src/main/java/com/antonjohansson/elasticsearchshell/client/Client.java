@@ -21,8 +21,10 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.Base64;
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.GenericType;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
@@ -30,6 +32,7 @@ import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
+import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.base.Function;
@@ -100,6 +103,20 @@ public class Client
     public ClusterHealth getClusterHealth()
     {
         return execute(client -> client.path("/_cluster/health").get(ClusterHealth.class));
+    }
+
+    /**
+     * Gets all indices and their mappings.
+     *
+     * @return Returns the mappings.
+     */
+    public Map<String, IndexMappings> getMappings()
+    {
+        GenericType<Map<String, IndexMappings>> responseType = new GenericType<Map<String, IndexMappings>>()
+        {
+        };
+
+        return execute(client -> client.path("/_mappings").get(responseType));
     }
 
     private <T> T execute(Function<WebClient, T> mapper)

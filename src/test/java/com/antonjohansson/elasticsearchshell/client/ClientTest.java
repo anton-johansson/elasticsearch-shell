@@ -15,6 +15,7 @@
  */
 package com.antonjohansson.elasticsearchshell.client;
 
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ALL_INDICES_AND_MAPPINGS;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_HEALTH;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_INFO;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.PORT;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.when;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
 import java.util.Base64;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -39,6 +41,7 @@ import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo.Version;
+import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 
 /**
  * Unit tests of {@link Client}.
@@ -68,6 +71,7 @@ public class ClientTest extends Assert
         server.when(request().withHeader("Authorization", authorization("bad-password"))).respond(response(UNAUTHORIZED));
         server.when(request().withHeader("Authorization", authorization("ok-password"))).respond(response(OK).withBody("{}"));
         server.when(request().withMethod("GET").withPath("/_cluster/health")).respond(response(OK).withBody(CLUSTER_HEALTH));
+        server.when(request().withMethod("GET").withPath("/_mappings")).respond(response(OK).withBody(ALL_INDICES_AND_MAPPINGS));
         server.when(request().withMethod("GET")).respond(response(OK).withBody(CLUSTER_INFO));
     }
 
@@ -178,6 +182,15 @@ public class ClientTest extends Assert
         expected.setNumberOfDataNodes(1);
 
         ClusterHealth actual = client.getClusterHealth();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_getMappings()
+    {
+        Map<String, IndexMappings> actual = client.getMappings();
+        Map<String, IndexMappings> expected = ClientTestData.ACTUAL_ALL_MAPPINGS;
 
         assertEquals(expected, actual);
     }

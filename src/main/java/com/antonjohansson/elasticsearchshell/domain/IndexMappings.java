@@ -13,67 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.antonjohansson.elasticsearchshell.session;
+package com.antonjohansson.elasticsearchshell.domain;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.hash;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
-import java.util.Optional;
+import java.util.Map;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
-import com.antonjohansson.elasticsearchshell.connection.Connection;
-import com.antonjohansson.elasticsearchshell.index.IndexKey;
-
 /**
- * Defines a session.
+ * Holds mappings for an index.
  */
-public class Session
+public class IndexMappings
 {
-    private String name = "";
-    private Connection connection;
-    private IndexKey currentIndex;
+    private Map<String, Object> mappings = emptyMap();
 
-    public String getName()
+    public Map<String, Object> getMappings()
     {
-        return name;
+        return mappings;
     }
 
-    public void setName(String name)
+    public void setMappings(Map<String, Object> mappings)
     {
-        this.name = name;
-    }
-
-    public Connection getConnection()
-    {
-        return connection;
-    }
-
-    public void setConnection(Connection connection)
-    {
-        this.connection = connection;
-    }
-
-    public Optional<Connection> getOptionalConnection()
-    {
-        return Optional.ofNullable(connection);
-    }
-
-    public IndexKey getCurrentIndex()
-    {
-        return currentIndex;
-    }
-
-    public void setCurrentIndex(IndexKey currentIndex)
-    {
-        this.currentIndex = currentIndex;
+        this.mappings = mappings;
     }
 
     @Override
     public int hashCode()
     {
-        return hash(name);
+        return hash(mappings);
     }
 
     @Override
@@ -88,11 +59,9 @@ public class Session
             return true;
         }
 
-        Session that = (Session) obj;
+        IndexMappings that = (IndexMappings) obj;
         return new EqualsBuilder()
-                .append(this.name, that.name)
-                .append(this.connection, that.connection)
-                .append(this.currentIndex, that.currentIndex)
+                .append(this.mappings, that.mappings)
                 .isEquals();
     }
 
