@@ -55,6 +55,10 @@ public class TestDataUtils
         {
             return (T) new Integer(id);
         }
+        if (clazz.isAssignableFrom(boolean.class))
+        {
+            return (T) new Boolean(id % 2 == 1);
+        }
 
         T value = newInstance(clazz);
         populate(value, id);

@@ -18,6 +18,9 @@ package com.antonjohansson.elasticsearchshell.client;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ALL_INDICES_AND_MAPPINGS;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_HEALTH;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_INFO;
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX;
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_ACK;
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_NO_ACK;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.PORT;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.connection;
 import static org.mockito.Mockito.when;
@@ -41,7 +44,9 @@ import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo.Version;
+import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
+import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
 
 /**
  * Unit tests of {@link Client}.
@@ -49,6 +54,7 @@ import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 public class ClientTest extends Assert
 {
     private static final int OK = 200;
+    private static final int BAD_REQUEST = 400;
     private static final int UNAUTHORIZED = 401;
     private static final int SERVER_ERROR = 500;
     private static final String JSON = "application/json";
@@ -72,6 +78,9 @@ public class ClientTest extends Assert
         server.when(request().withHeader("Authorization", authorization("ok-password"))).respond(response(OK).withBody("{}"));
         server.when(request().withMethod("GET").withPath("/_cluster/health")).respond(response(OK).withBody(CLUSTER_HEALTH));
         server.when(request().withMethod("GET").withPath("/_mappings")).respond(response(OK).withBody(ALL_INDICES_AND_MAPPINGS));
+        server.when(request().withMethod("PUT").withPath("/my-new-index").withBody(INDEX)).respond(response(OK).withBody(INDEX_ACK));
+        server.when(request().withMethod("PUT").withPath("/not-acknowledged-index")).respond(response(OK).withBody(INDEX_NO_ACK));
+        server.when(request().withMethod("PUT").withPath("/existing-index")).respond(response(BAD_REQUEST));
         server.when(request().withMethod("GET")).respond(response(OK).withBody(CLUSTER_INFO));
     }
 
@@ -193,5 +202,33 @@ public class ClientTest extends Assert
         Map<String, IndexMappings> expected = ClientTestData.ACTUAL_ALL_MAPPINGS;
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_createIndex()
+    {
+        IndexSettings settings = new IndexSettings();
+        settings.setNumberOfReplicas(1);
+        settings.setNumberOfShards(2);
+
+        Index index = new Index();
+        index.setSettings(settings);
+
+        boolean result = client.createIndex("my-new-index", index);
+        assertTrue(result);
+    }
+
+    @Test
+    public void test_createIndex_not_acknowledged()
+    {
+        boolean result = client.createIndex("not-acknowledged-index", new Index());
+        assertFalse(result);
+    }
+
+    @Test
+    public void test_createIndex_with_error()
+    {
+        boolean result = client.createIndex("existing-index", new Index());
+        assertFalse(result);
     }
 }

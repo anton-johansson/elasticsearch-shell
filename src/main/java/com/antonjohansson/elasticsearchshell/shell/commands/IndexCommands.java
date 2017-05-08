@@ -15,6 +15,8 @@
  */
 package com.antonjohansson.elasticsearchshell.shell.commands;
 
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,9 @@ import org.springframework.stereotype.Component;
 
 import com.antonjohansson.elasticsearchshell.client.Client;
 import com.antonjohansson.elasticsearchshell.client.ClientFactory;
+import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
+import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
 import com.antonjohansson.elasticsearchshell.index.IndexKey;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
 
@@ -78,6 +82,40 @@ public class IndexCommands extends AbstractCommand
             console().writeLine("Now using '%s'. Index has %d types.", key, indexMappings.getMappings().size());
 
             sessionManager.getCurrentSession().setCurrentIndex(key);
+        });
+    }
+
+    /**
+     * Creates a new index.
+     *
+     * @param name The name of the index to create.
+     * @param numberOfShards The number of shards of the new index.
+     * @param numberOfReplicas The number of replicas of the new index.
+     */
+    @CliCommand(value = "create-index", help = "Creates a new index")
+    public void create(
+            @CliOption(key = "name", mandatory = true, help = "The name of the index to create") String name,
+            @CliOption(key = "shards", unspecifiedDefaultValue = "1", help = "The number of shards of the index") int numberOfShards,
+            @CliOption(key = "replicas", unspecifiedDefaultValue = "0", help = "The number of replicas of the index") int numberOfReplicas)
+    {
+        command(() ->
+        {
+            IndexSettings settings = new IndexSettings();
+            settings.setNumberOfShards(numberOfShards);
+            settings.setNumberOfReplicas(numberOfReplicas);
+
+            Index index = new Index();
+            index.setSettings(settings);
+
+            boolean result = clientFactory.getClient()
+                    .createIndex(name, index);
+
+            if (!result)
+            {
+                throw new CommandException("Could not create index '%s'", name);
+            }
+
+            console().writeLine("Created index '%s'", WHITE, name);
         });
     }
 

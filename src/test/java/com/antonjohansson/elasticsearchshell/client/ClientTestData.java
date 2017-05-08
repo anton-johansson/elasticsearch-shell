@@ -50,6 +50,23 @@ public class ClientTestData
             .put("number_of_data_nodes", 1)
             .build();
 
+    public static final String INDEX = json()
+            .child("settings")
+            .put("number_of_replicas", 1)
+            .put("number_of_shards", 2)
+            .parent
+            .build();
+
+    public static final String INDEX_ACK = json()
+            .put("acknowledged", true)
+            .put("shards_acknowledged", false)
+            .build();
+
+    public static final String INDEX_NO_ACK = json()
+            .put("acknowledged", false)
+            .put("shards_acknowledged", false)
+            .build();
+
     static final String ALL_INDICES_AND_MAPPINGS = "{\"my-index\":{\"mappings\":{\"User\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"email\":{\"type\":\"keyword\",\"index\":false},\"firstName\":{\"type\":\"keyword\",\"index\":false},\"lastName\":{\"type\":\"keyword\",\"index\":false},\"password\":{\"type\":\"keyword\",\"index\":false},\"userName\":{\"type\":\"keyword\",\"index\":false}}},\"OtherType\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}}},\"my-other-index\":{\"mappings\":{\"OtherType\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}}}}";
 
     public static final Map<String, IndexMappings> ACTUAL_ALL_MAPPINGS = allMappings();
