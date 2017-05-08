@@ -25,13 +25,17 @@ import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 
 import com.antonjohansson.elasticsearchshell.common.ElasticsearchException;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
+import com.antonjohansson.elasticsearchshell.domain.Acknowledgement;
 import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
+import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -117,6 +121,32 @@ public class Client
         };
 
         return execute(client -> client.path("/_mappings").get(responseType));
+    }
+
+    /**
+     * Creates a new index with the given settings.
+     *
+     * @param name The name of the index to create.
+     * @param index The definition of the index.
+     * @return Returns whether or not the index could be created.
+     */
+    public boolean createIndex(String name, Index index)
+    {
+        Acknowledgement acknowledgement = execute(client ->
+        {
+            Response response = client()
+                    .path("/{indexName}", name)
+                    .put(index);
+
+            if (response.getStatus() == Status.OK.getStatusCode())
+            {
+                return response.readEntity(Acknowledgement.class);
+            }
+
+            return new Acknowledgement();
+        });
+
+        return acknowledgement.isAcknowledged();
     }
 
     private <T> T execute(Function<WebClient, T> mapper)

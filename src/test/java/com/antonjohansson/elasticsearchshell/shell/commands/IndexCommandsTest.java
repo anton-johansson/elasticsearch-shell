@@ -17,6 +17,7 @@ package com.antonjohansson.elasticsearchshell.shell.commands;
 
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ACTUAL_ALL_MAPPINGS;
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -32,6 +33,8 @@ import org.springframework.shell.core.CommandResult;
 import com.antonjohansson.elasticsearchshell.client.Client;
 import com.antonjohansson.elasticsearchshell.client.ClientFactory;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
+import com.antonjohansson.elasticsearchshell.domain.Index;
+import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
 import com.antonjohansson.elasticsearchshell.index.IndexKey;
 import com.antonjohansson.elasticsearchshell.session.Session;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
@@ -57,8 +60,20 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
 
         when(clientFactory.getClient()).thenReturn(client);
         when(client.getMappings()).thenReturn(ACTUAL_ALL_MAPPINGS);
+        when(client.createIndex("new-index", index())).thenReturn(true);
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(session.getOptionalConnection()).thenReturn(Optional.of(new Connection()));
+    }
+
+    private Index index()
+    {
+        IndexSettings settings = new IndexSettings();
+        settings.setNumberOfReplicas(1);
+        settings.setNumberOfShards(2);
+
+        Index index = new Index();
+        index.setSettings(settings);
+        return index;
     }
 
     @Test
@@ -115,5 +130,29 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
     {
         CommandResult result = shell().executeCommand("current-index");
         assertFalse(result.isSuccess());
+    }
+
+    @Test
+    public void test_create()
+    {
+        CommandResult result = shell().executeCommand("create-index --name new-index --shards 2 --replicas 1");
+        assertTrue(result.isSuccess());
+
+        InOrder inOrder = inOrder(console, client);
+        inOrder.verify(client).createIndex("new-index", index());
+        inOrder.verify(console).writeLine("Created index '%s'", WHITE, "new-index");
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void test_existing_create()
+    {
+        CommandResult result = shell().executeCommand("create-index --name existing-index --shards 2 --replicas 1");
+        assertTrue(result.isSuccess());
+
+        InOrder inOrder = inOrder(console, client);
+        inOrder.verify(client).createIndex("existing-index", index());
+        inOrder.verify(console).writeLine("Could not create index 'existing-index'", RED);
+        inOrder.verifyNoMoreInteractions();
     }
 }
