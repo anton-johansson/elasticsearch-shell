@@ -37,6 +37,8 @@ import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
+import com.antonjohansson.elasticsearchshell.domain.node.Node;
+import com.antonjohansson.elasticsearchshell.domain.node.NodesInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.base.Function;
@@ -147,6 +149,18 @@ public class Client
         });
 
         return acknowledgement.isAcknowledged();
+    }
+
+    /**
+     * Gets information about a specific node.
+     *
+     * @param name The name of the node to get information about.
+     * @return Returns the {@link Node node}.
+     */
+    public Node getNodeInfo(String name)
+    {
+        NodesInfo info = execute(client -> client.path("/_nodes/stats").get(NodesInfo.class));
+        return info.getNodeByName(name);
     }
 
     private <T> T execute(Function<WebClient, T> mapper)

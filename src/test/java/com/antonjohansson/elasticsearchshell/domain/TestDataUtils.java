@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +59,10 @@ public class TestDataUtils
         if (clazz.isAssignableFrom(boolean.class))
         {
             return (T) new Boolean(id % 2 == 1);
+        }
+        if (clazz.isAssignableFrom(BigInteger.class))
+        {
+            return (T) new BigInteger(String.valueOf(id));
         }
 
         T value = newInstance(clazz);

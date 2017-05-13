@@ -21,11 +21,13 @@ import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTE
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_ACK;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_NO_ACK;
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.NODE_STATS;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.PORT;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.connection;
 import static org.mockito.Mockito.when;
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 
+import java.math.BigInteger;
 import java.util.Base64;
 import java.util.Map;
 
@@ -47,6 +49,7 @@ import com.antonjohansson.elasticsearchshell.domain.ClusterInfo.Version;
 import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
+import com.antonjohansson.elasticsearchshell.domain.node.Node;
 
 /**
  * Unit tests of {@link Client}.
@@ -81,6 +84,7 @@ public class ClientTest extends Assert
         server.when(request().withMethod("PUT").withPath("/my-new-index").withBody(INDEX)).respond(response(OK).withBody(INDEX_ACK));
         server.when(request().withMethod("PUT").withPath("/not-acknowledged-index")).respond(response(OK).withBody(INDEX_NO_ACK));
         server.when(request().withMethod("PUT").withPath("/existing-index")).respond(response(BAD_REQUEST));
+        server.when(request().withMethod("GET").withPath("/_nodes/stats")).respond(response(OK).withBody(NODE_STATS));
         server.when(request().withMethod("GET")).respond(response(OK).withBody(CLUSTER_INFO));
     }
 
@@ -230,5 +234,21 @@ public class ClientTest extends Assert
     {
         boolean result = client.createIndex("existing-index", new Index());
         assertFalse(result);
+    }
+
+    @Test
+    public void test_getNodeInfo()
+    {
+        Node actual = client.getNodeInfo("node1");
+        Node expected = new Node();
+        expected.setName("node1");
+        expected.getOperatingSystem().getCpu().setPercentage(3);
+        expected.getOperatingSystem().getMemory().setUsedPercentage(86);
+        expected.getOperatingSystem().getMemory().setFreePercentage(14);
+        expected.getOperatingSystem().getMemory().setTotalInBytes(new BigInteger("8243830784"));
+        expected.getOperatingSystem().getMemory().setUsedInBytes(new BigInteger("7107895296"));
+        expected.getOperatingSystem().getMemory().setFreeInBytes(new BigInteger("1135935488"));
+
+        assertEquals(expected, actual);
     }
 }
