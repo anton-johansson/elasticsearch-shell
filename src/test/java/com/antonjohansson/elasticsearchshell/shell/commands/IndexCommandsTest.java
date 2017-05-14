@@ -16,6 +16,7 @@
 package com.antonjohansson.elasticsearchshell.shell.commands;
 
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ACTUAL_ALL_MAPPINGS;
+import static com.antonjohansson.elasticsearchshell.domain.TestDataUtils.createItem;
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
 import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.WHITE;
 import static org.mockito.Mockito.inOrder;
@@ -35,6 +36,7 @@ import com.antonjohansson.elasticsearchshell.client.ClientFactory;
 import com.antonjohansson.elasticsearchshell.connection.Connection;
 import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
+import com.antonjohansson.elasticsearchshell.domain.index.IndexStatsContainer;
 import com.antonjohansson.elasticsearchshell.index.IndexKey;
 import com.antonjohansson.elasticsearchshell.session.Session;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
@@ -61,8 +63,11 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
         when(clientFactory.getClient()).thenReturn(client);
         when(client.getMappings()).thenReturn(ACTUAL_ALL_MAPPINGS);
         when(client.createIndex("new-index", index())).thenReturn(true);
+        when(client.getIndexStats("test-index")).thenReturn(Optional.of(createItem(IndexStatsContainer.class, 1)));
+        when(client.deleteIndex("test-index")).thenReturn(true);
         when(sessionManager.getCurrentSession()).thenReturn(session);
         when(session.getOptionalConnection()).thenReturn(Optional.of(new Connection()));
+        when(console.readLine("Enter the name of the index to confirm deletion: ", WHITE)).thenReturn("test-index");
     }
 
     private Index index()
@@ -154,5 +159,71 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
         inOrder.verify(client).createIndex("existing-index", index());
         inOrder.verify(console).writeLine("Could not create index 'existing-index'", RED);
         inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void test_deleteIndex()
+    {
+        when(session.getCurrentIndex()).thenReturn(new IndexKey("test-index"));
+
+        CommandResult result = shell().executeCommand("delete-index");
+        assertTrue(result.isSuccess());
+
+        InOrder inOrder = inOrder(console, client);
+        inOrder.verify(client).getIndexStats("test-index");
+        inOrder.verify(console).writeLine("The current index has %d documents", WHITE, 1);
+        inOrder.verify(console).readLine("Enter the name of the index to confirm deletion: ", WHITE);
+        inOrder.verify(client).deleteIndex("test-index");
+        inOrder.verify(console).writeLine("Successfully removed index '%s'", WHITE, "test-index");
+        verifyNoMoreInteractions(console, client);
+    }
+
+    @Test
+    public void test_deleteIndex_missing_index()
+    {
+        when(session.getCurrentIndex()).thenReturn(new IndexKey("missing-index"));
+
+        CommandResult result = shell().executeCommand("delete-index");
+        assertTrue(result.isSuccess());
+
+        InOrder inOrder = inOrder(console, client);
+        inOrder.verify(client).getIndexStats("missing-index");
+        inOrder.verify(console).writeLine("Index with name 'missing-index' was not found", RED);
+        verifyNoMoreInteractions(console, client);
+    }
+
+    @Test
+    public void test_deleteIndex_bad_confirmation()
+    {
+        when(session.getCurrentIndex()).thenReturn(new IndexKey("test-index"));
+        when(console.readLine("Enter the name of the index to confirm deletion: ", WHITE)).thenReturn("not-the-same-index-name");
+
+        CommandResult result = shell().executeCommand("delete-index");
+        assertTrue(result.isSuccess());
+
+        InOrder inOrder = inOrder(console, client);
+        inOrder.verify(client).getIndexStats("test-index");
+        inOrder.verify(console).writeLine("The current index has %d documents", WHITE, 1);
+        inOrder.verify(console).readLine("Enter the name of the index to confirm deletion: ", WHITE);
+        inOrder.verify(console).writeLine("The entered index name does not match the current index name", RED);
+        verifyNoMoreInteractions(console, client);
+    }
+
+    @Test
+    public void test_deleteIndex_could_not_delete()
+    {
+        when(session.getCurrentIndex()).thenReturn(new IndexKey("test-index"));
+        when(client.deleteIndex("test-index")).thenReturn(false);
+
+        CommandResult result = shell().executeCommand("delete-index");
+        assertTrue(result.isSuccess());
+
+        InOrder inOrder = inOrder(console, client);
+        inOrder.verify(client).getIndexStats("test-index");
+        inOrder.verify(console).writeLine("The current index has %d documents", WHITE, 1);
+        inOrder.verify(console).readLine("Enter the name of the index to confirm deletion: ", WHITE);
+        inOrder.verify(client).deleteIndex("test-index");
+        inOrder.verify(console).writeLine("Could not remove index 'test-index'", RED);
+        verifyNoMoreInteractions(console, client);
     }
 }

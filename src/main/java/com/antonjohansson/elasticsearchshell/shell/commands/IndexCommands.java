@@ -30,7 +30,9 @@ import com.antonjohansson.elasticsearchshell.client.ClientFactory;
 import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
+import com.antonjohansson.elasticsearchshell.domain.index.IndexStatsContainer;
 import com.antonjohansson.elasticsearchshell.index.IndexKey;
+import com.antonjohansson.elasticsearchshell.session.Session;
 import com.antonjohansson.elasticsearchshell.session.SessionManager;
 
 /**
@@ -60,7 +62,7 @@ public class IndexCommands extends AbstractCommand
         return sessionManager.getCurrentSession().getOptionalConnection().isPresent();
     }
 
-    @CliAvailabilityIndicator({"current-index"})
+    @CliAvailabilityIndicator({"current-index", "delete-index"})
     public boolean isIndexChosen()
     {
         return sessionManager.getCurrentSession().getCurrentIndex() != null;
@@ -116,6 +118,42 @@ public class IndexCommands extends AbstractCommand
             }
 
             console().writeLine("Created index '%s'", WHITE, name);
+        });
+    }
+
+    /**
+     * Deletes the current index.
+     */
+    @CliCommand(value = "delete-index", help = "Deletes the currently used index")
+    public void delete()
+    {
+        command(() ->
+        {
+            Session currentSession = sessionManager.getCurrentSession();
+            String indexName = currentSession.getCurrentIndex().getName();
+
+            IndexStatsContainer container = clientFactory.getClient()
+                    .getIndexStats(indexName)
+                    .orElseThrow(() -> new CommandException("Index with name '%s' was not found", indexName));
+
+            int documentCount = container.getTotal().getDocuments().getCount();
+            console().writeLine("The current index has %d documents", WHITE, documentCount);
+            String input = console().readLine("Enter the name of the index to confirm deletion: ", WHITE);
+            if (!input.equals(indexName))
+            {
+                throw new CommandException("The entered index name does not match the current index name");
+            }
+
+            boolean result = clientFactory.getClient().deleteIndex(indexName);
+            if (result)
+            {
+                console().writeLine("Successfully removed index '%s'", WHITE, indexName);
+                currentSession.setCurrentIndex(null);
+            }
+            else
+            {
+                throw new CommandException("Could not remove index '%s'", indexName);
+            }
         });
     }
 

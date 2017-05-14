@@ -22,6 +22,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
@@ -37,6 +38,8 @@ import com.antonjohansson.elasticsearchshell.domain.ClusterHealth;
 import com.antonjohansson.elasticsearchshell.domain.ClusterInfo;
 import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
+import com.antonjohansson.elasticsearchshell.domain.index.IndexStatsContainer;
+import com.antonjohansson.elasticsearchshell.domain.index.IndexStatsResult;
 import com.antonjohansson.elasticsearchshell.domain.node.Node;
 import com.antonjohansson.elasticsearchshell.domain.node.NodesInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -149,6 +152,44 @@ public class Client
         });
 
         return acknowledgement.isAcknowledged();
+    }
+
+    /**
+     * Deletes the index with the given name.
+     *
+     * @param name The name of the index to delete.
+     * @return Returns whether or not the index could be deleted.
+     */
+    public boolean deleteIndex(String name)
+    {
+        Acknowledgement acknowledgement = execute(client ->
+        {
+            Response response = client
+                .path("/{indexName}", name)
+                .delete();
+
+            if (response.getStatus() == Status.OK.getStatusCode())
+            {
+                return response.readEntity(Acknowledgement.class);
+            }
+
+            return new Acknowledgement();
+        });
+
+        return acknowledgement.isAcknowledged();
+    }
+
+    /**
+     * Gets the statistics of a specific index, with the given name.
+     *
+     * @param indexName The name of the index to get statistics for.
+     * @return Returns the index statistics.
+     */
+    public Optional<IndexStatsContainer> getIndexStats(String indexName)
+    {
+        IndexStatsResult result = execute(client -> client.path("/{indexName}/_stats", indexName).get(IndexStatsResult.class));
+        IndexStatsContainer stats = result.getIndices().get(indexName);
+        return Optional.ofNullable(stats);
     }
 
     /**

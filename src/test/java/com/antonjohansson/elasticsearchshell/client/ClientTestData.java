@@ -57,18 +57,17 @@ public class ClientTestData
             .parent
             .build();
 
-    public static final String INDEX_ACK = json()
+    public static final String ACK_TRUE = json()
             .put("acknowledged", true)
-            .put("shards_acknowledged", false)
             .build();
 
-    public static final String INDEX_NO_ACK = json()
+    public static final String ACK_FALSE = json()
             .put("acknowledged", false)
-            .put("shards_acknowledged", false)
             .build();
 
     static final String ALL_INDICES_AND_MAPPINGS = "{\"my-index\":{\"mappings\":{\"User\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"email\":{\"type\":\"keyword\",\"index\":false},\"firstName\":{\"type\":\"keyword\",\"index\":false},\"lastName\":{\"type\":\"keyword\",\"index\":false},\"password\":{\"type\":\"keyword\",\"index\":false},\"userName\":{\"type\":\"keyword\",\"index\":false}}},\"OtherType\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}}},\"my-other-index\":{\"mappings\":{\"OtherType\":{\"dynamic\":\"strict\",\"_all\":{\"enabled\":false},\"properties\":{\"someString\":{\"type\":\"keyword\",\"index\":false},\"someInteger\":{\"type\":\"integer\"}}}}}}";
     static final String NODE_STATS = "{\"cluster_name\":\"test-cluster\",\"nodes\":{\"YjwABNYGThechGoNdM0rBA\":{\"name\":\"node1\",\"os\":{\"cpu\":{\"percent\":3},\"mem\":{\"total_in_bytes\":8243830784,\"free_in_bytes\":1135935488,\"used_in_bytes\":7107895296,\"free_percent\":14,\"used_percent\":86}}}}}";
+    static final String INDEX_STATS = "{\"indices\":{\"test-index\":{\"primaries\":{\"docs\":{\"count\":18,\"deleted\":1}},\"total\":{\"docs\":{\"count\":18,\"deleted\":1}}}}}";
 
     public static final Map<String, IndexMappings> ACTUAL_ALL_MAPPINGS = allMappings();
 
