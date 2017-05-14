@@ -15,12 +15,13 @@
  */
 package com.antonjohansson.elasticsearchshell.client;
 
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ACK_FALSE;
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ACK_TRUE;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.ALL_INDICES_AND_MAPPINGS;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_HEALTH;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.CLUSTER_INFO;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX;
-import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_ACK;
-import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_NO_ACK;
+import static com.antonjohansson.elasticsearchshell.client.ClientTestData.INDEX_STATS;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.NODE_STATS;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.PORT;
 import static com.antonjohansson.elasticsearchshell.client.ClientTestData.connection;
@@ -30,6 +31,7 @@ import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import java.math.BigInteger;
 import java.util.Base64;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -49,6 +51,8 @@ import com.antonjohansson.elasticsearchshell.domain.ClusterInfo.Version;
 import com.antonjohansson.elasticsearchshell.domain.Index;
 import com.antonjohansson.elasticsearchshell.domain.IndexMappings;
 import com.antonjohansson.elasticsearchshell.domain.IndexSettings;
+import com.antonjohansson.elasticsearchshell.domain.index.IndexStats;
+import com.antonjohansson.elasticsearchshell.domain.index.IndexStatsContainer;
 import com.antonjohansson.elasticsearchshell.domain.node.Node;
 
 /**
@@ -59,6 +63,7 @@ public class ClientTest extends Assert
     private static final int OK = 200;
     private static final int BAD_REQUEST = 400;
     private static final int UNAUTHORIZED = 401;
+    private static final int NOT_FOUND = 404;
     private static final int SERVER_ERROR = 500;
     private static final String JSON = "application/json";
 
@@ -81,10 +86,21 @@ public class ClientTest extends Assert
         server.when(request().withHeader("Authorization", authorization("ok-password"))).respond(response(OK).withBody("{}"));
         server.when(request().withMethod("GET").withPath("/_cluster/health")).respond(response(OK).withBody(CLUSTER_HEALTH));
         server.when(request().withMethod("GET").withPath("/_mappings")).respond(response(OK).withBody(ALL_INDICES_AND_MAPPINGS));
-        server.when(request().withMethod("PUT").withPath("/my-new-index").withBody(INDEX)).respond(response(OK).withBody(INDEX_ACK));
-        server.when(request().withMethod("PUT").withPath("/not-acknowledged-index")).respond(response(OK).withBody(INDEX_NO_ACK));
+
+        // Create index
+        server.when(request().withMethod("PUT").withPath("/my-new-index").withBody(INDEX)).respond(response(OK).withBody(ACK_TRUE));
+        server.when(request().withMethod("PUT").withPath("/not-acknowledged-index")).respond(response(OK).withBody(ACK_FALSE));
         server.when(request().withMethod("PUT").withPath("/existing-index")).respond(response(BAD_REQUEST));
+
+        // Delete index
+        server.when(request().withMethod("DELETE").withPath("/my-index")).respond(response(OK).withBody(ACK_TRUE));
+        server.when(request().withMethod("DELETE").withPath("/not-existing-index")).respond(response(NOT_FOUND));
+
+        // Statistics
         server.when(request().withMethod("GET").withPath("/_nodes/stats")).respond(response(OK).withBody(NODE_STATS));
+        server.when(request().withMethod("GET").withPath("/test-index/_stats")).respond(response(OK).withBody(INDEX_STATS));
+
+        // Cluster
         server.when(request().withMethod("GET")).respond(response(OK).withBody(CLUSTER_INFO));
     }
 
@@ -234,6 +250,42 @@ public class ClientTest extends Assert
     {
         boolean result = client.createIndex("existing-index", new Index());
         assertFalse(result);
+    }
+
+    @Test
+    public void test_deleteIndex()
+    {
+        boolean result = client.deleteIndex("my-index");
+        assertTrue(result);
+    }
+
+    @Test
+    public void test_deleteIndex_non_existing()
+    {
+        boolean result = client.deleteIndex("non-existing-index");
+        assertFalse(result);
+    }
+
+    @Test
+    public void test_getIndexStats()
+    {
+        IndexStats stats = new IndexStats();
+        stats.getDocuments().setCount(18);
+        stats.getDocuments().setDeleted(1);
+
+        IndexStatsContainer actual = client.getIndexStats("test-index").get();
+        IndexStatsContainer expected = new IndexStatsContainer();
+        expected.setPrimaries(stats);
+        expected.setTotal(stats);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void test_getIndexStats_missing_index()
+    {
+        Optional<IndexStatsContainer> result = client.getIndexStats("non-existing-index");
+        assertFalse(result.isPresent());
     }
 
     @Test
