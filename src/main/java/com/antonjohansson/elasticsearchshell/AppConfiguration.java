@@ -16,10 +16,14 @@
 package com.antonjohansson.elasticsearchshell;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.shell.support.logging.HandlerUtils;
+
+import com.antonjohansson.elasticsearchshell.shell.output.Console;
 
 /**
  * Configures various things for the application.
@@ -36,5 +40,11 @@ class AppConfiguration
         File configurationPath = new File(home, ".elasticsearch-shell");
         configurationPath.mkdirs();
         return configurationPath;
+    }
+
+    @Bean
+    public Logger getLogger()
+    {
+        return HandlerUtils.getLogger(Console.class);
     }
 }

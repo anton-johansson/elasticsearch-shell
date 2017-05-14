@@ -15,14 +15,13 @@
  */
 package com.antonjohansson.elasticsearchshell.shell.output;
 
+import static com.antonjohansson.elasticsearchshell.utils.ReflectionUtils.getFieldValue;
+
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.JLineShell;
-import org.springframework.shell.support.logging.HandlerUtils;
 import org.springframework.stereotype.Component;
 
 import jline.console.ConsoleReader;
@@ -33,14 +32,14 @@ import jline.console.ConsoleReader;
 @Component
 public class Console
 {
-    private static final Logger LOG = HandlerUtils.getLogger(Console.class);
-
     private final JLineShell shell;
+    private final Logger log;
 
     @Autowired
-    Console(JLineShell shell)
+    Console(JLineShell shell, Logger log)
     {
         this.shell = shell;
+        this.log = log;
     }
 
     /**
@@ -51,7 +50,7 @@ public class Console
      */
     public void writeLine(String text, Object... params)
     {
-        LOG.info(ConsoleColor.RESET + String.format(text, params));
+        log.info(ConsoleColor.RESET + String.format(text, params));
     }
 
     /**
@@ -63,7 +62,7 @@ public class Console
      */
     public void writeLine(String text, ConsoleColor color, Object... params)
     {
-        LOG.info(color.format(String.format(text, params)));
+        log.info(color.format(String.format(text, params)));
     }
 
     /**
@@ -75,7 +74,7 @@ public class Console
      */
     public String readLine(String prompt, ConsoleColor color, Object... params)
     {
-        ConsoleReader reader = getConsoleReader();
+        ConsoleReader reader = getFieldValue(JLineShell.class, shell, "reader");
 
         try
         {
@@ -84,19 +83,6 @@ public class Console
         catch (IOException e)
         {
             throw new RuntimeException("Could not read data from the prompt", e);
-        }
-    }
-
-    private ConsoleReader getConsoleReader()
-    {
-        Field field = FieldUtils.getField(JLineShell.class, "reader", true);
-        try
-        {
-            return (ConsoleReader) field.get(shell);
-        }
-        catch (IllegalArgumentException | IllegalAccessException e)
-        {
-            throw new RuntimeException("Could not get the 'reader' field from the shell");
         }
     }
 }
