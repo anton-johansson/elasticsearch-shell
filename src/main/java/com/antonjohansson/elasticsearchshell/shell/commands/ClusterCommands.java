@@ -15,6 +15,15 @@
  */
 package com.antonjohansson.elasticsearchshell.shell.commands;
 
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.GREEN;
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.RED;
+import static com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor.YELLOW;
+import static java.util.Collections.unmodifiableMap;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.core.annotation.CliAvailabilityIndicator;
 import org.springframework.shell.core.annotation.CliCommand;
@@ -31,8 +40,19 @@ import com.antonjohansson.elasticsearchshell.shell.output.ConsoleColor;
 @Component
 public class ClusterCommands extends AbstractCommand
 {
+    private static final Map<String, ConsoleColor> STATUS_TO_COLOR_MAP = getStatusToColorMap();
+
     private SessionManager sessionManager;
     private ClientFactory factory;
+
+    private static Map<String, ConsoleColor> getStatusToColorMap()
+    {
+        Map<String, ConsoleColor> map = new HashMap<>();
+        map.put("green", GREEN);
+        map.put("yellow", YELLOW);
+        map.put("red", RED);
+        return unmodifiableMap(map);
+    }
 
     @Autowired
     void setSessionManager(SessionManager sessionManager)
@@ -60,22 +80,9 @@ public class ClusterCommands extends AbstractCommand
         command(() ->
         {
             ClusterHealth health = factory.getClient().getClusterHealth();
-            ConsoleColor colorOfStatus = getColorOfStatus(health.getStatus());
+            ConsoleColor colorOfStatus = Optional.ofNullable(STATUS_TO_COLOR_MAP.get(health.getStatus())).orElse(RED);
             String status = colorOfStatus.format(health.getStatus());
             console().writeLine("The cluster status is '%s' and it has %d nodes (where %d node(s) are data nodes)", status, health.getNumberOfNodes(), health.getNumberOfDataNodes());
         });
-    }
-
-    private ConsoleColor getColorOfStatus(String status)
-    {
-        switch (status)
-        {
-            case "green":
-                return ConsoleColor.GREEN;
-            case "yellow":
-                return ConsoleColor.YELLOW;
-            default:
-                return ConsoleColor.RED;
-        }
     }
 }
