@@ -81,7 +81,7 @@ public class IndexCommands extends AbstractCommand
                     .map(mappings -> mappings.get(key.getName()))
                     .orElseThrow(() -> new CommandException("No index named '%s' was found", key));
 
-            console().writeLine("Now using '%s'. Index has %d types.", key, indexMappings.getMappings().size());
+            console().writeLine("Now using '%s'. Index has %d types.", WHITE, key, indexMappings.getMappings().size());
 
             sessionManager.getCurrentSession().setCurrentIndex(key);
         });

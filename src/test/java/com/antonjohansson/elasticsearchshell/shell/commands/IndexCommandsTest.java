@@ -90,7 +90,7 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
         InOrder inOrder = inOrder(client, clientFactory, console, session, sessionManager);
         inOrder.verify(clientFactory).getClient();
         inOrder.verify(client).getMappings();
-        inOrder.verify(console).writeLine("Now using '%s'. Index has %d types.", new IndexKey("my-index"), 2);
+        inOrder.verify(console).writeLine("Now using '%s'. Index has %d types.", WHITE, new IndexKey("my-index"), 2);
         inOrder.verify(sessionManager).getCurrentSession();
         inOrder.verify(session).setCurrentIndex(new IndexKey("my-index"));
         inOrder.verifyNoMoreInteractions();
