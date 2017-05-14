@@ -77,9 +77,9 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
     }
 
     @Test
-    public void test_index()
+    public void test_use()
     {
-        CommandResult result = shell().executeCommand("index my-index");
+        CommandResult result = shell().executeCommand("use my-index");
         assertTrue(result.isSuccess());
 
         InOrder inOrder = inOrder(client, clientFactory, console, session, sessionManager);
@@ -92,18 +92,18 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
     }
 
     @Test
-    public void test_index_when_not_connected()
+    public void test_use_when_not_connected()
     {
         when(session.getOptionalConnection()).thenReturn(Optional.empty());
 
-        CommandResult result = shell().executeCommand("index my-index");
+        CommandResult result = shell().executeCommand("index use-index");
         assertFalse(result.isSuccess());
     }
 
     @Test
-    public void test_index_non_existing()
+    public void test_use_non_existing()
     {
-        CommandResult result = shell().executeCommand("index non-existing-index");
+        CommandResult result = shell().executeCommand("use non-existing-index");
         assertTrue(result.isSuccess());
 
         InOrder inOrder = inOrder(client, clientFactory, console, session, sessionManager);

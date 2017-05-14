@@ -69,8 +69,8 @@ public class IndexCommands extends AbstractCommand
     /**
      * Selects an index to work with.
      */
-    @CliCommand(value = "index", help = "Selects an index to work with")
-    public void index(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the index to work with") IndexKey key)
+    @CliCommand(value = "use", help = "Selects an index to work with")
+    public void use(@CliOption(key = {"", "name"}, mandatory = true, help = "The name of the index to work with") IndexKey key)
     {
         command(() ->
         {
