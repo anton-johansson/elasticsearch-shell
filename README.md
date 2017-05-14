@@ -6,6 +6,8 @@
 
 Provides a shell for managing Elasticsearch instances.
 
+<img src="screenshot.png">
+
 
 ## Build
 
