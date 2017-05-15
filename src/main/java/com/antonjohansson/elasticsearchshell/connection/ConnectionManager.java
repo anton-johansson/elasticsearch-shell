@@ -15,6 +15,7 @@
  */
 package com.antonjohansson.elasticsearchshell.connection;
 
+import static com.antonjohansson.elasticsearchshell.utils.Constants.CONFIGURATION_FILE;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class ConnectionManager
     private final File connectionsPath;
 
     @Autowired
-    ConnectionManager(@Qualifier("configurationPath") File configurationPath)
+    ConnectionManager(@Qualifier(CONFIGURATION_FILE) File configurationPath)
     {
         connectionsPath = getConnectionsPath(configurationPath);
     }
