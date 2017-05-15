@@ -15,6 +15,8 @@
  */
 package com.antonjohansson.elasticsearchshell.utils;
 
+import static org.apache.commons.io.IOUtils.closeQuietly;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,8 +39,10 @@ public final class PropertiesUtils
      */
     public static Properties read(File file)
     {
-        try (InputStream input = new FileInputStream(file))
+        InputStream input = null;
+        try
         {
+            input = new FileInputStream(file);
             Properties properties = new Properties();
             properties.load(input);
             return properties;
@@ -47,6 +51,10 @@ public final class PropertiesUtils
         {
             throw new RuntimeException(e);
         }
+        finally
+        {
+            closeQuietly(input);
+        }
     }
 
     /**
@@ -54,13 +62,19 @@ public final class PropertiesUtils
      */
     public static void write(Properties properties, File file)
     {
-        try (OutputStream output = new FileOutputStream(file))
+        OutputStream output = null;
+        try
         {
+            output = new FileOutputStream(file);
             properties.store(output, "");
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
+        }
+        finally
+        {
+            closeQuietly(output);
         }
     }
 }
