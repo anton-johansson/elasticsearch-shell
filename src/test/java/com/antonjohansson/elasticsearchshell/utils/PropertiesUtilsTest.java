@@ -15,26 +15,26 @@
  */
 package com.antonjohansson.elasticsearchshell.utils;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
+import java.util.Properties;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests of {@link ReflectionUtils}.
+ * Unit tests of {@link PropertiesUtils}.
  */
-public class ReflectionUtilsTest extends Assert
+public class PropertiesUtilsTest extends Assert
 {
-    private final TestClass testInstance = new TestClass();
-
     @Test
     public void test_constructor() throws Exception
     {
-        int classModifiers = ReflectionUtils.class.getModifiers();
+        int classModifiers = PropertiesUtils.class.getModifiers();
         assertTrue("Expected class to be final", Modifier.isFinal(classModifiers));
 
-        Constructor<?>[] constructors = ReflectionUtils.class.getDeclaredConstructors();
+        Constructor<?>[] constructors = PropertiesUtils.class.getDeclaredConstructors();
         assertEquals("Expected class to have one single constructor", 1, constructors.length);
 
         Constructor<?> constructor = constructors[0];
@@ -52,26 +52,29 @@ public class ReflectionUtilsTest extends Assert
     }
 
     @Test
-    public void test_getFieldValue()
+    public void read()
     {
-        String actual = ReflectionUtils.getFieldValue(TestClass.class, testInstance, "data");
-        String expected = "value";
-
-        assertEquals(expected, actual);
+        String file = PropertiesUtilsTest.class.getResource("/test-file.txt").getFile();
+        Properties properties = PropertiesUtils.read(new File(file));
+        assertNotNull(properties);
     }
 
     @Test(expected = RuntimeException.class)
-    public void test_getFieldValue_field_that_does_not_exist()
+    public void read_bad_call()
     {
-        ReflectionUtils.getFieldValue(TestClass.class, testInstance, "nonExistingField");
+        PropertiesUtils.read(null);
     }
 
-    /**
-     * Defines a class, used for testing the reflection utilities.
-     */
-    private static class TestClass
+    @Test
+    public void output()
     {
-        @SuppressWarnings("unused")
-        private final String data = "value";
+        String file = PropertiesUtilsTest.class.getResource("/test-file.txt").getFile();
+        PropertiesUtils.write(new Properties(), new File(file));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void output_bad_call()
+    {
+        PropertiesUtils.write(null, null);
     }
 }

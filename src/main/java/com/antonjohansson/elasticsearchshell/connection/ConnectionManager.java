@@ -18,11 +18,6 @@ package com.antonjohansson.elasticsearchshell.connection;
 import static org.apache.commons.lang3.math.NumberUtils.toInt;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
@@ -33,6 +28,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+
+import com.antonjohansson.elasticsearchshell.utils.PropertiesUtils;
 
 /**
  * Manages connections.
@@ -61,23 +58,15 @@ public class ConnectionManager
 
     private Connection load(File file)
     {
-        Properties properties = new Properties();
-        try (InputStream stream = new FileInputStream(file))
-        {
-            properties.load(stream);
+        Properties properties = PropertiesUtils.read(file);
 
-            Connection connection = new Connection();
-            connection.setName(file.getName());
-            connection.setHost(properties.getProperty("host"));
-            connection.setPort(toInt(properties.getProperty("port")));
-            connection.setUsername(properties.getProperty("username", ""));
-            connection.setPassword(properties.getProperty("password", ""));
-            return connection;
-        }
-        catch (IOException e)
-        {
-            throw new RuntimeException("Could not load configuration at '" + file + "'", e);
-        }
+        Connection connection = new Connection();
+        connection.setName(file.getName());
+        connection.setHost(properties.getProperty("host"));
+        connection.setPort(toInt(properties.getProperty("port")));
+        connection.setUsername(properties.getProperty("username", ""));
+        connection.setPassword(properties.getProperty("password", ""));
+        return connection;
     }
 
     private File getConnectionsPath(File configurationPath)
@@ -114,14 +103,7 @@ public class ConnectionManager
         properties.setProperty("password", connection.getPassword());
 
         File file = new File(connectionsPath, connection.getName());
-        try (OutputStream stream = new FileOutputStream(file))
-        {
-            properties.store(stream, "");
-        }
-        catch (Exception e)
-        {
-            throw new RuntimeException("Exception occurred when persisting connection", e);
-        }
+        PropertiesUtils.write(properties, file);
     }
 
     /**
