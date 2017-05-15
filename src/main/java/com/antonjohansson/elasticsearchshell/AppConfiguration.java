@@ -15,6 +15,8 @@
  */
 package com.antonjohansson.elasticsearchshell;
 
+import static com.antonjohansson.elasticsearchshell.utils.Constants.CONFIGURATION_FILE;
+
 import java.io.File;
 import java.util.logging.Logger;
 
@@ -32,7 +34,7 @@ import com.antonjohansson.elasticsearchshell.shell.output.Console;
 class AppConfiguration
 {
     @Bean
-    @Qualifier("configurationPath")
+    @Qualifier(CONFIGURATION_FILE)
     public File getConfigurationPath()
     {
         String homePath = System.getProperty("user.home");
