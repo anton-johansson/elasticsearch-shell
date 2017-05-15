@@ -101,7 +101,7 @@ public class IndexCommandsTest extends AbstractCommandTest<IndexCommands>
     {
         when(session.getOptionalConnection()).thenReturn(Optional.empty());
 
-        CommandResult result = shell().executeCommand("index use-index");
+        CommandResult result = shell().executeCommand("use use-index");
         assertFalse(result.isSuccess());
     }
 

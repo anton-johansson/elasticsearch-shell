@@ -56,7 +56,7 @@ public class IndexCommands extends AbstractCommand
         this.sessionManager = sessionManager;
     }
 
-    @CliAvailabilityIndicator({"index"})
+    @CliAvailabilityIndicator({"use"})
     public boolean isConnected()
     {
         return sessionManager.getCurrentSession().getOptionalConnection().isPresent();
