@@ -80,6 +80,7 @@
 
         <!-- Plug-in dependencies -->
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
+        <jdeb.version>1.4</jdeb.version>
         <license-maven-plugin.version>3.0</license-maven-plugin.version>
     </properties>
 
@@ -149,7 +150,6 @@
 
     <build>
         <plugins>
-            <!-- Check licenses -->
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -160,6 +160,7 @@
                         <exclude>README.md</exclude>
                         <exclude>LICENSE</exclude>
                         <exclude>.checkstyle</exclude>
+                        <exclude>src/deb/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -184,29 +185,13 @@
                         </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>runtime</includeScope>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <useUniqueVersions>false</useUniqueVersions>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.antonjohansson.elasticsearchshell.EntryPoint</mainClass>
-                        </manifest>
-                        <manifestEntries>
-                            <version>${project.version}</version>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -219,6 +204,67 @@
                     </formats>
                     <check />
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.vafer</groupId>
+                <artifactId>jdeb</artifactId>
+                <version>${jdeb.version}</version>
+                <configuration>
+                    <dataSet>
+                        <data>
+                            <type>template</type>
+                            <paths>
+                                <path>var/lib/${project.artifactId}</path>
+                            </paths>
+                            <mapper>
+                                <type>perm</type>
+                            </mapper>
+                        </data>
+                        <data>
+                            <src>${basedir}/LICENSE</src>
+                            <type>file</type>
+                            <mapper>
+                                <type>perm</type>
+                                <prefix>/var/lib/${project.artifactId}/doc</prefix>
+                            </mapper>
+                        </data>
+                        <data>
+                            <src>${basedir}/src/deb/run.sh</src>
+                            <dst>${project.artifactId}</dst>
+                            <type>file</type>
+                            <mapper>
+                                <type>perm</type>
+                                <prefix>/bin</prefix>
+                                <filemode>755</filemode>
+                            </mapper>
+                        </data>
+                        <data>
+                            <src>${project.build.directory}/${project.build.finalName}.jar</src>
+                            <dst>${project.artifactId}.jar</dst>
+                            <type>file</type>
+                            <mapper>
+                                <type>perm</type>
+                                <prefix>/var/lib/${project.artifactId}/bin</prefix>
+                            </mapper>
+                        </data>
+                        <data>
+                            <src>${project.build.directory}/lib</src>
+                            <type>directory</type>
+                            <mapper>
+                                <type>perm</type>
+                                <prefix>/var/lib/${project.artifactId}/bin</prefix>
+                            </mapper>
+                        </data>
+                    </dataSet>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jdeb</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
