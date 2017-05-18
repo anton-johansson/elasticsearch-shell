@@ -7,7 +7,19 @@ cache:
     - $HOME/.m2
 
 script:
+  - mvn package -DskipTests
   - mvn cobertura:cobertura
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+before_deploy:
+  - export DEB_FILE=$(ls target/ldap-password-reset-service*.deb)
+
+deploy:
+  provider: releases
+  api_key: "${GITHUB_TOKEN}"
+  file: "${DEB_FILE}"
+  skip_cleanup: true
+  on:
+    tags: true
