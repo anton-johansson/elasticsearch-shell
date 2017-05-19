@@ -66,6 +66,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <npm.package.directory>${project.build.directory}/npm/</npm.package.directory>
+        <node.installation.directory>${project.build.directory}/node/</node.installation.directory>
+        <node.installation.version>v6.9.1</node.installation.version>
 
         <!-- Dependencies -->
         <commons-lang3.version>3.5</commons-lang3.version>
@@ -80,8 +83,10 @@
 
         <!-- Plug-in dependencies -->
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
+        <frontend-maven-plugin.version>1.4</frontend-maven-plugin.version>
         <jdeb.version>1.4</jdeb.version>
         <license-maven-plugin.version>3.0</license-maven-plugin.version>
+        <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
     </properties>
 
     <dependencies>
@@ -161,6 +166,7 @@
                         <exclude>LICENSE</exclude>
                         <exclude>.checkstyle</exclude>
                         <exclude>src/deb/**</exclude>
+                        <exclude>src/npm/.npmignore</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -189,6 +195,47 @@
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>copy-npm-files</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${npm.package.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/src/npm/</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <targetPath>lib/</targetPath>
+                                    <includes>
+                                        <include>${project.build.finalName}.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.build.directory}/lib</directory>
+                                    <targetPath>lib/</targetPath>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>LICENSE</include>
+                                        <include>README.md</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
@@ -263,6 +310,36 @@
                         <goals>
                             <goal>jdeb</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>${frontend-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>install-node-and-npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                        <configuration>
+                            <nodeVersion>${node.installation.version}</nodeVersion>
+                            <installDirectory>${node.installation.directory}</installDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>npm-publish</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                        <configuration>
+                            <arguments>publish</arguments>
+                            <workingDirectory>${npm.package.directory}</workingDirectory>
+                            <installDirectory>${node.installation.directory}</installDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -1,0 +1,29 @@
+{
+  "name": "${project.artifactId}",
+  "version": "${project.version}",
+  "description": "${project.description}",
+  "preferGlobal": true,
+  "bin": {
+    "${project.artifactId}": "cli.js"
+  },
+  "files": [
+    "cli.js",
+    "lib"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anton-johansson/elasticsearch-shell"
+  },
+  "keywords": [
+    "elasticsearch",
+    "shell",
+    "cli",
+    "command-line",
+    "interface"
+  ],
+  "author": "Anton Johansson",
+  "license": "Apache-2.0"
+}
