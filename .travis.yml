@@ -6,6 +6,9 @@ cache:
   directories:
     - $HOME/.m2
 
+before_script:
+  - echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
+
 script:
   - mvn package -DskipTests
   - mvn cobertura:cobertura
