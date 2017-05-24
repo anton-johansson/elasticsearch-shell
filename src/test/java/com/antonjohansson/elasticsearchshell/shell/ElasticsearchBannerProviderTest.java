@@ -51,7 +51,7 @@ public class ElasticsearchBannerProviderTest extends Assert
     @Test
     public void test_getBanner()
     {
-        assertNull(provider.getBanner());
+        assertNotNull(provider.getBanner());
     }
 
     @Test

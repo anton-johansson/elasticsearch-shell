@@ -15,6 +15,7 @@
  */
 package com.antonjohansson.elasticsearchshell.shell;
 
+import static java.lang.System.lineSeparator;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,17 @@ import com.antonjohansson.elasticsearchshell.common.ShellVersion;
 @Order(HIGHEST_PRECEDENCE)
 public class ElasticsearchBannerProvider implements BannerProvider
 {
+    private static final String BANNER = (""
+        + "       _           _   _                              _                    _          _ _ ?"
+        + "      | |         | | (_)                            | |                  | |        | | |?"
+        + "   ___| | __ _ ___| |_ _  ___ ___  ___  __ _ _ __ ___| |__    ______   ___| |__   ___| | |?"
+        + "  / _ # |/ _` / __| __| |/ __/ __|# _ #/ _` | '__/ __| '_ #  |______| / __| '_ # / _ # | |?"
+        + " |  __/ | (_| #__ # |_| | (__#__ #  __/ (_| | | | (__| | | |          #__ # | | |  __/ | |?"
+        + "  #___|_|#__,_|___/#__|_|#___|___/#___|#__,_|_|  #___|_| |_|          |___/_| |_|#___|_|_|?")
+
+                .replace("#", "\\")
+                .replace("?", lineSeparator());
+
     private final ShellVersion version;
 
     @Autowired
@@ -42,7 +54,7 @@ public class ElasticsearchBannerProvider implements BannerProvider
     @Override
     public String getBanner()
     {
-        return null;
+        return BANNER;
     }
 
     @Override
