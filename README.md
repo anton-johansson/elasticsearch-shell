@@ -8,6 +8,15 @@ Provides a shell for managing Elasticsearch instances.
 
 <img src="screenshot.png">
 
+## Features
+
+ * Show cluster health
+ * Show node information
+ * Handle multiple connections
+ * Session management
+ * Create indices
+ * Delete indices
+
 
 ## Build
 
