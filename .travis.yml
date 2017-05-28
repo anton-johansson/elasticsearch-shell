@@ -17,7 +17,7 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 before_deploy:
-  - export DEB_FILE=$(ls target/ldap-password-reset-service*.deb)
+  - export DEB_FILE=$(ls target/*.deb)
 
 deploy:
   provider: releases
