@@ -18,6 +18,22 @@ Provides a shell for managing Elasticsearch instances.
  * Delete indices
 
 
+## Install
+
+### dpkg
+
+```shell
+$ https://github.com/anton-johansson/elasticsearch-shell/releases/download/v1.0.0/elasticsearch-shell_1.0.0_all.deb
+$ sudo dpkg --install elasticsearch-shell_1.0.0_all.deb
+```
+
+### npm
+
+```shell
+$ npm install --global elasticsearch-shell
+```
+
+
 ## Build
 
 ```
