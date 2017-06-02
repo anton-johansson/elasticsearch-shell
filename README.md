@@ -20,13 +20,6 @@ Provides a shell for managing Elasticsearch instances.
 
 ## Install
 
-### dpkg
-
-```shell
-$ https://github.com/anton-johansson/elasticsearch-shell/releases/download/v1.0.0/elasticsearch-shell_1.0.0_all.deb
-$ sudo dpkg --install elasticsearch-shell_1.0.0_all.deb
-```
-
 ### apt
 
 ```shell
@@ -34,6 +27,13 @@ $ echo 'deb [arch=all] http://apt.anton-johansson.com/ stable main' > /etc/apt/s
 $ curl -fsSL http://apt.anton-johansson.com/signing-key.pub | sudo apt-key add -
 $ sudo apt update
 $ sudo apt install elasticsearch-shell
+```
+
+### dpkg
+
+```shell
+$ https://github.com/anton-johansson/elasticsearch-shell/releases/download/v1.0.0/elasticsearch-shell_1.0.0_all.deb
+$ sudo dpkg --install elasticsearch-shell_1.0.0_all.deb
 ```
 
 ### npm
