@@ -27,6 +27,15 @@ $ https://github.com/anton-johansson/elasticsearch-shell/releases/download/v1.0.
 $ sudo dpkg --install elasticsearch-shell_1.0.0_all.deb
 ```
 
+### apt
+
+```shell
+$ echo 'deb [arch=all] http://apt.anton-johansson.com/ stable main' > /etc/apt/sources.list.d/anton-johansson.list
+$ curl -fsSL http://apt.anton-johansson.com/signing-key.pub | sudo apt-key add -
+$ sudo apt update
+$ sudo apt install elasticsearch-shell
+```
+
 ### npm
 
 ```shell
